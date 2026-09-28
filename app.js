@@ -895,7 +895,6 @@ class DiwanApp {
     this.poemPoetName.textContent = poetName;
     this.poemEraBadge.textContent = eraName || '-';
     this.poemMeterBadge.textContent = poemSummary.meter || poemSummary.bahr || '-';
-    this.poemVersesCountBadge.textContent = '-';
 
     this.currentPoem = {
       id: poemSummary.id || poemSummary.slug,
@@ -965,7 +964,6 @@ class DiwanApp {
       this.poemPoetName.textContent = this.currentPoem.poetName;
       this.poemEraBadge.textContent = this.currentPoem.eraName || 'أدب عربي';
       this.poemMeterBadge.textContent = this.currentPoem.meter || 'شعر عربي';
-      this.poemVersesCountBadge.textContent = `${this.currentPoem.verses.length} بيتاً`;
 
       this.renderVerses();
       this.updateBreadcrumbs();
