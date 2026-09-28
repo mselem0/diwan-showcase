@@ -1,513 +1,13 @@
 /**
  * روائع الديوان | Diwan Showcase Web App Engine
- * High-performance, zero-dependency SPA with offline fallbacks,
- * Diwan API integration, rich Arabic typography, and canvas image export.
+ * 100% Dynamic API-driven SPA connected directly to Diwan API.
+ * Zero mock data, robust error handling (CORS/403/Network), skeletons & loading states.
  */
 
-// ==========================================
-// 1. Rich Mock Data & Fallback Knowledge Base
-// ==========================================
-const MOCK_DATA = {
-  stats: {
-    eras: '10+',
-    poets: '+2,800',
-    poems: '+160,000'
-  },
-  eras: [
-    { id: 'all', name: 'كافة العصور', slug: 'all', count: 24 },
-    { id: 'jahili', name: 'العصر الجاهلي', slug: 'jahili', count: 5, desc: 'عصر الفصاحة وأصحاب المعلقات الخالدة' },
-    { id: 'umayyad', name: 'العصر الإسلامي والأموي', slug: 'umayyad', count: 4, desc: 'بزوغ رسالة الإسلام وأراجيز الفتوحات والغزل العذري' },
-    { id: 'abbasi', name: 'العصر العباسي', slug: 'abbasi', count: 7, desc: 'العصر الذهبي للأدب والحكمة والفلسفة الشعرية' },
-    { id: 'andalusi', name: 'العصر الأندلسي', slug: 'andalusi', count: 4, desc: 'فردوس الموشحات ورقة الوصف وشوق الاغتراب' },
-    { id: 'modern', name: 'العصر الحديث والمعاصر', slug: 'modern', count: 4, desc: 'حركة الإحياء والنهضة والشعر الحر' }
-  ],
-  poets: [
-    {
-      id: 'al-mutanabbi',
-      name: 'أبو الطيب المتنبي',
-      eraId: 'abbasi',
-      eraName: 'العصر العباسي',
-      title: 'شاعر العرب ومالك ناصية البيان',
-      bio: 'أحمد بن الحسين الجعفي الكندي، ملأ الدنيا وشغل الناس، حكيم الشعراء وأشعر أهل البادية والحاضرة.',
-      avatar: '📜',
-      poemsCount: 3
-    },
-    {
-      id: 'antara',
-      name: 'عنترة بن شداد',
-      eraId: 'jahili',
-      eraName: 'العصر الجاهلي',
-      title: 'فارس بني عبس وصاحب المعلقة',
-      bio: 'عنترة بن شداد العبسي، جمع بين شجاعة الميدان ورقة الغزل العفيف بعبلة.',
-      avatar: '⚔️',
-      poemsCount: 2
-    },
-    {
-      id: 'imru-al-qais',
-      name: 'امرؤ القيس',
-      eraId: 'jahili',
-      eraName: 'العصر الجاهلي',
-      title: 'الملك الضليل وأمير شعراء الجاهلية',
-      bio: 'حندج بن حجر الكندي، رائد الوقوف على الأطلال وبكاء الديار وأول من قيد الأوابد.',
-      avatar: '👑',
-      poemsCount: 1
-    },
-    {
-      id: 'ibn-zaydun',
-      name: 'ابن زيدون',
-      eraId: 'andalusi',
-      eraName: 'العصر الأندلسي',
-      title: 'شاعر قرطبة وعاشق ولادة',
-      bio: 'أحمد بن عبد الله بن زيدون المخزومي، وزير وشاعر الأندلس الأكبر وصاحب النونية الشهيرة.',
-      avatar: '🌸',
-      poemsCount: 1
-    },
-    {
-      id: 'ahmed-shawqi',
-      name: 'أحمد شوقي',
-      eraId: 'modern',
-      eraName: 'العصر الحديث والمعاصر',
-      title: 'أمير الشعراء',
-      bio: 'أحمد شوقي علي أحمد الهيال، زعيم النهضة الشعرية العربية ومجدد المسرح الشعري.',
-      avatar: '✒️',
-      poemsCount: 2
-    },
-    {
-      id: 'abu-firas',
-      name: 'أبو فراس الحمداني',
-      eraId: 'abbasi',
-      eraName: 'العصر العباسي',
-      title: 'أمير السيف والروميات',
-      bio: 'الحارث بن سعيد الحمداني، أمير وشاعر حمداني اشتهر بقصائده أثناء أسره في بلاد الروم.',
-      avatar: '🛡️',
-      poemsCount: 1
-    },
-    {
-      id: 'al-buhturi',
-      name: 'البحتري',
-      eraId: 'abbasi',
-      eraName: 'العصر العباسي',
-      title: 'صاحب سلاسل الذهب والسينية',
-      bio: 'أبو عبادة الوليد بن عبيد الطائي، أحد أعمدة الشعر العباسي المشهور بدقة الوصف وموسيقى الألفاظ.',
-      avatar: '🏛️',
-      poemsCount: 1
-    },
-    {
-      id: 'mahmoud-darwish',
-      name: 'محمود درويش',
-      eraId: 'modern',
-      eraName: 'العصر الحديث والمعاصر',
-      title: 'شاعر الأرض والمنفى',
-      bio: 'أحد أبرز شعراء المقاومة والوجدان الإنساني في الأدب العربي المعاصر.',
-      avatar: '🕊️',
-      poemsCount: 1
-    }
-  ],
-  poems: [
-    {
-      id: 'mutanabbi-sayf-al-dawla',
-      poetId: 'al-mutanabbi',
-      poetName: 'أبو الطيب المتنبي',
-      eraId: 'abbasi',
-      eraName: 'العصر العباسي',
-      title: 'عَلى قَدرِ أَهلِ العَزمِ تَأتي العَزائِمُ',
-      meter: 'بحر الطويل',
-      rhyme: 'الميم',
-      verses: [
-        {
-          num: 1,
-          sadr: 'عَلى قَدرِ أَهلِ العَزمِ تَأتي العَزائِمُ',
-          ajuz: 'وَتَأتي عَلى قَدرِ الكِرامِ المَكارِمُ'
-        },
-        {
-          num: 2,
-          sadr: 'وَتَعظُمُ في عَينِ الصَغيرِ صِغارُها',
-          ajuz: 'وَتَصغُرُ في عَينِ العَظيمِ العَظائِمُ'
-        },
-        {
-          num: 3,
-          sadr: 'يُكَلِّفُ سَيفُ الدَولَةِ الجَيشَ هَمَّهُ',
-          ajuz: 'وَقَد عَجَزَت عَنهُ الجُيوشُ الخَضارِمُ'
-        },
-        {
-          num: 4,
-          sadr: 'وَهَل رَدَّ عَنهُ البَحرَ خَوضُ رِجالِهِ',
-          ajuz: 'وَلَكِنَّ ما لا يُستَطاعُ مَلاحِمُ'
-        },
-        {
-          num: 5,
-          sadr: 'وَقَفتَ وَما في المَوتِ شَكٌّ لِواقِفٍ',
-          ajuz: 'كَأَنَّكَ في جَفنِ الرَدى وَهُوَ نائِمُ'
-        },
-        {
-          num: 6,
-          sadr: 'تَمُرُّ بِكَ الأَبطالُ كَلمى هَزيمَةً',
-          ajuz: 'وَوَجهُكَ وَضّاحٌ وَثَغرُكَ باسِمُ'
-        },
-        {
-          num: 7,
-          sadr: 'تَجاوَزتَ مِقدارَ الشَجاعَةِ وَالنُهى',
-          ajuz: 'إِلى قَولِ قَومٍ أَنتَ بِالغَيبِ عالِمُ'
-        }
-      ]
-    },
-    {
-      id: 'mutanabbi-saylu-al-firas',
-      poetId: 'al-mutanabbi',
-      poetName: 'أبو الطيب المتنبي',
-      eraId: 'abbasi',
-      eraName: 'العصر العباسي',
-      title: 'الخَيلُ وَاللَيلُ وَالبَيداءُ تَعرِفُني',
-      meter: 'بحر البسيط',
-      rhyme: 'الباء',
-      verses: [
-        {
-          num: 1,
-          sadr: 'الخَيلُ وَاللَيلُ وَالبَيداءُ تَعرِفُني',
-          ajuz: 'وَالسَيفُ وَالرُمحُ وَالقِرطاسُ وَالقَلَمُ'
-        },
-        {
-          num: 2,
-          sadr: 'صَحِبتُ في الفَلَواتِ الوَحشَ مُنفَرِداً',
-          ajuz: 'حَتّى تَعَجَّبَ مِنّي القُورُ وَالأَكَمُ'
-        },
-        {
-          num: 3,
-          sadr: 'أَنا الَّذي نَظَرَ الأَعمى إِلى أَدَبي',
-          ajuz: 'وَأَسمَعَت كَلِماتي مَن بِهِ صَمَمُ'
-        },
-        {
-          num: 4,
-          sadr: 'أَنامُ مِلءَ جُفوني عَن شَوارِدِها',
-          ajuz: 'وَيَسهَرُ الخَلقُ جَرّاها وَيَختَصِمُ'
-        },
-        {
-          num: 5,
-          sadr: 'وَما اِنتِفاعُ أَخي الدُنيا بِناظِرِهِ',
-          ajuz: 'إِذا اِستَوَت عِندَهُ الأَنوارُ وَالظُلَمُ'
-        }
-      ]
-    },
-    {
-      id: 'mutanabbi-idh-ra-ayta',
-      poetId: 'al-mutanabbi',
-      poetName: 'أبو الطيب المتنبي',
-      eraId: 'abbasi',
-      eraName: 'العصر العباسي',
-      title: 'إِذا رَأَيتَ نُيوبَ اللَيثِ بارِزَةً',
-      meter: 'بحر البسيط',
-      rhyme: 'الميم',
-      verses: [
-        {
-          num: 1,
-          sadr: 'إِذا رَأَيتَ نُيوبَ اللَيثِ بارِزَةً',
-          ajuz: 'فَلا تَظُنَّنَّ أَنَّ اللَيثَ يَبتَسِمُ'
-        },
-        {
-          num: 2,
-          sadr: 'وَمُهجَةٍ سُقتُها في كَفِّ صاحِبِها',
-          ajuz: 'عِزّاً وَلَم يَرَها إِخوانُهُ غَنَمُ'
-        }
-      ]
-    },
-    {
-      id: 'antara-muallaqa',
-      poetId: 'antara',
-      poetName: 'عنترة بن شداد',
-      eraId: 'jahili',
-      eraName: 'العصر الجاهلي',
-      title: 'مُعَلَّقَةُ عَنْتَرَةَ: هَل غادَرَ الشُعَراءُ مِن مُتَرَدَّمِ',
-      meter: 'بحر الكامل',
-      rhyme: 'الميم',
-      verses: [
-        {
-          num: 1,
-          sadr: 'هَل غادَرَ الشُعَراءُ مِن مُتَرَدَّمِ',
-          ajuz: 'أَم هَل عَرَفتَ الدارَ بَعدَ تَوَهُّمِ'
-        },
-        {
-          num: 2,
-          sadr: 'يا دارَ عَبلَةَ بِالجِواءِ تَكَلَّمي',
-          ajuz: 'وَعِمي صَباحاً دارَ عَبلَةَ وَاِسلَمي'
-        },
-        {
-          num: 3,
-          sadr: 'وَلَقَد شَفَى نَفْسِي وَأَبْرَأَ سُقْمَهَا',
-          ajuz: 'قِيلُ الفَوَارِسِ وَيْكَ عَنْتَرَ أَقْدِمِ'
-        },
-        {
-          num: 4,
-          sadr: 'يَدعُونَ عَنْتَرَ وَالرِّمَاحُ كَأَنَّهَا',
-          ajuz: 'أَشْطَانُ بِئْرٍ فِي لَبَانِ الأَدْهَمِ'
-        },
-        {
-          num: 5,
-          sadr: 'وَلَقَدْ ذَكَرْتُكِ وَالرِّمَاحُ نَوَاهِلٌ',
-          ajuz: 'مِنِّي وَبِيضُ الهِنْدِ تَقْطُرُ مِنْ دَمِي'
-        },
-        {
-          num: 6,
-          sadr: 'فَوَدِدْتُ تَقْبِيلَ السُّيُوفِ لِأَنَّهَا',
-          ajuz: 'لَمَعَتْ كَبَارِقِ ثَغْرِكِ المُتَبَسِّمِ'
-        }
-      ]
-    },
-    {
-      id: 'antara-hukm',
-      poetId: 'antara',
-      poetName: 'عنترة بن شداد',
-      eraId: 'jahili',
-      eraName: 'العصر الجاهلي',
-      title: 'حَكِّم سُيوفَكَ في رِقابِ العُذَّلِ',
-      meter: 'بحر الكامل',
-      rhyme: 'اللام',
-      verses: [
-        {
-          num: 1,
-          sadr: 'حَكِّم سُيوفَكَ في رِقابِ العُذَّلِ',
-          ajuz: 'وَإِذا نَزَلتَ بِدارِ عِزٍّ فَاِرحَلِ'
-        },
-        {
-          num: 2,
-          sadr: 'لا تَسقِني ماءَ الحَياةِ بِذِلَّةٍ',
-          ajuz: 'بَل فَاِسقِني بِالعِزِّ كَأسَ الحَنظَلِ'
-        },
-        {
-          num: 3,
-          sadr: 'ماءُ الحَياةِ بِذِلَّةٍ كَجَهَنَّمٍ',
-          ajuz: 'وَجَهَنَّمٌ بِالعِزِّ أَطيَبُ مَنزِلِ'
-        }
-      ]
-    },
-    {
-      id: 'imru-qifa-nabki',
-      poetId: 'imru-al-qais',
-      poetName: 'امرؤ القيس',
-      eraId: 'jahili',
-      eraName: 'العصر الجاهلي',
-      title: 'قِفا نَبكِ مِن ذِكرى حَبيبٍ وَمَنزِلِ',
-      meter: 'بحر الطويل',
-      rhyme: 'اللام',
-      verses: [
-        {
-          num: 1,
-          sadr: 'قِفا نَبكِ مِن ذِكرى حَبيبٍ وَمَنزِلِ',
-          ajuz: 'بِسِقطِ اللِوى بَينَ الدَخولِ فَحَومَلِ'
-        },
-        {
-          num: 2,
-          sadr: 'فَتوضِحَ فَالمِقراةِ لَم يَعفُ رَسمُها',
-          ajuz: 'لِما نَسَجَتها مِن جَنوبٍ وَشَمأَلِ'
-        },
-        {
-          num: 3,
-          sadr: 'وَلَيلٍ كَمَوجِ البَحرِ أَرخى سُدولَهُ',
-          ajuz: 'عَلَيَّ بِأَنواعِ الهُمومِ لِيَبتَلي'
-        },
-        {
-          num: 4,
-          sadr: 'فَقُلتُ لَهُ لَمّا تَمَطّى بِصُلبِهِ',
-          ajuz: 'وَأَردَفَ أَعجازاً وَناءَ بِكَلْكَلِ'
-        },
-        {
-          num: 5,
-          sadr: 'أَلا أَيُّها اللَيلُ الطَويلُ أَلا اِنجَلي',
-          ajuz: 'بِصُبحٍ وَما الإِصباحُ مِنكَ بِأَمثَلِ'
-        }
-      ]
-    },
-    {
-      id: 'ibn-zaydun-nuniyya',
-      poetId: 'ibn-zaydun',
-      poetName: 'ابن زيدون',
-      eraId: 'andalusi',
-      eraName: 'العصر الأندلسي',
-      title: 'أَضحى التَنائي بَديلاً مِن تَدانينا',
-      meter: 'بحر البسيط',
-      rhyme: 'النون',
-      verses: [
-        {
-          num: 1,
-          sadr: 'أَضحى التَنائي بَديلاً مِن تَدانينا',
-          ajuz: 'وَنابَ عَن طيبِ لُقيانا تَجافينا'
-        },
-        {
-          num: 2,
-          sadr: 'أَلّا وَقَد حانَ صُبحُ البَينِ صَبَّحَنا',
-          ajuz: 'حَينٌ فَقامَ بِنا رَيبُ الرَدى فينا'
-        },
-        {
-          num: 3,
-          sadr: 'بِنْتُم وَبِنّا فَما اِبتَلَّت جَوانِحُنا',
-          ajuz: 'شَوقاً إِلَيكُم وَلا جَفَّت مَآقِينا'
-        },
-        {
-          num: 4,
-          sadr: 'نَكادُ حينَ تُناجيكُم ضَمائِرُنا',
-          ajuz: 'يَقضي عَلَينا الأَسى لَولا تَأَسّينا'
-        },
-        {
-          num: 5,
-          sadr: 'إِنَّ الزَمانَ الَّذي ما زالَ يُضحِكُنا',
-          ajuz: 'أُنساً بِقُربِكُمُ قَد عادَ يُبكينا'
-        }
-      ]
-    },
-    {
-      id: 'shawqi-nahj-al-burda',
-      poetId: 'ahmed-shawqi',
-      poetName: 'أحمد شوقي',
-      eraId: 'modern',
-      eraName: 'العصر الحديث والمعاصر',
-      title: 'نَهْجُ البُرْدَةِ: رِيمٌ عَلى القاعِ',
-      meter: 'بحر البسيط',
-      rhyme: 'الميم',
-      verses: [
-        {
-          num: 1,
-          sadr: 'ريمٌ عَلى القاعِ بَينَ البانِ وَالعَلَمِ',
-          ajuz: 'أَحَلَّ سَفكَ دَمي في الأَشهُرِ الحُرُمِ'
-        },
-        {
-          num: 2,
-          sadr: 'لَمّا رَنا حَدَّثَتني النَفسُ قائِلَةً',
-          ajuz: 'يا وَيحَ جَنبِكَ بِالسَهمِ المُصيبِ رُرمي'
-        },
-        {
-          num: 3,
-          sadr: 'يا لائِمي في هَواهُ وَالهَوى قَدَرٌ',
-          ajuz: 'لَو شَفَّكَ الوَجدُ لَم تَعذِل وَلَم تَلُمِ'
-        },
-        {
-          num: 4,
-          sadr: 'مُحَمَّدٌ صَفوَةُ الباري وَرَحمَتُهُ',
-          ajuz: 'وَبُغيَةُ اللَهِ مِن خَلقٍ وَمِن نَسَمِ'
-        },
-        {
-          num: 5,
-          sadr: 'وَجاءَ بِالحَقِّ لا كِذبٌ يُمازِجُهُ',
-          ajuz: 'وَلا شَكوكٌ تُعَفّي نورَ مُبتَسَمِ'
-        }
-      ]
-    },
-    {
-      id: 'shawqi-al-muallim',
-      poetId: 'ahmed-shawqi',
-      poetName: 'أحمد شوقي',
-      eraId: 'modern',
-      eraName: 'العصر الحديث والمعاصر',
-      title: 'قُم لِلمُعَلِّمِ وَفِّهِ التَبجيلا',
-      meter: 'بحر الكامل',
-      rhyme: 'اللام',
-      verses: [
-        {
-          num: 1,
-          sadr: 'قُم لِلمُعَلِّمِ وَفِّهِ التَبجيلا',
-          ajuz: 'كادَ المُعَلِّمُ أَن يَكونَ رَسولا'
-        },
-        {
-          num: 2,
-          sadr: 'أَعَلِمتَ أَشرَفَ أَو أَجَلَّ مِنَ الَّذي',
-          ajuz: 'يَبني وَيُنشِئُ أَنفُساً وَعُقولا'
-        },
-        {
-          num: 3,
-          sadr: 'سُبحانَكَ اللَهُمَّ خَيرَ مُعَلِّمٍ',
-          ajuz: 'عَلَّمتَ بِالقَلَمِ القُرونَ الأولى'
-        }
-      ]
-    },
-    {
-      id: 'abu-firas-araka',
-      poetId: 'abu-firas',
-      poetName: 'أبو فراس الحمداني',
-      eraId: 'abbasi',
-      eraName: 'العصر العباسي',
-      title: 'أَراكَ عَصِيَّ الدَمعِ شيمَتُكَ الصَبرُ',
-      meter: 'بحر الطويل',
-      rhyme: 'الراء',
-      verses: [
-        {
-          num: 1,
-          sadr: 'أَراكَ عَصِيَّ الدَمعِ شيمَتُكَ الصَبرُ',
-          ajuz: 'أَما لِلهَوى نَهيٌ عَلَيكَ وَلا أَمرُ'
-        },
-        {
-          num: 2,
-          sadr: 'بَلى أَنا مُشتاقٌ وَعِندِيَ لَوعَةٌ',
-          ajuz: 'وَلَكِنَّ مِثلي لا يُذاعُ لَهُ سِرُّ'
-        },
-        {
-          num: 3,
-          sadr: 'إِذا اللَيلُ أَضواني بَسَطتُ يَدَ الهَوى',
-          ajuz: 'وَأَذلَلتُ دَمعاً مِن خَلائِقِهِ الكِبرُ'
-        },
-        {
-          num: 4,
-          sadr: 'سَيَذكُرُني قَومي إِذا جَدَّ جِدُّهُم',
-          ajuz: 'وَفي اللَيلَةِ الظَلماءِ يُفتَقَدُ البَدرُ'
-        }
-      ]
-    },
-    {
-      id: 'buhturi-sinia',
-      poetId: 'al-buhturi',
-      poetName: 'البحتري',
-      eraId: 'abbasi',
-      eraName: 'العصر العباسي',
-      title: 'صُنتُ نَفسي عَمّا يُدَنِّسُ نَفسي (السِّينِيَّة)',
-      meter: 'بحر الخفيف',
-      rhyme: 'السين',
-      verses: [
-        {
-          num: 1,
-          sadr: 'صُنتُ نَفسي عَمّا يُدَنِّسُ نَفسي',
-          ajuz: 'وَتَرَفَّعتُ عَن جَدا كُلِّ جِبسِ'
-        },
-        {
-          num: 2,
-          sadr: 'وَتَماسَكتُ حينَ زَعزَعَني الدَهـ',
-          ajuz: 'ـرُ اِلتِماساً مِنهُ لِتَعسي وَنُكْسي'
-        },
-        {
-          num: 3,
-          sadr: 'حَضَرَت رَحبَةُ الإِيوانِ وَالعِزُّ باذِخٌ',
-          ajuz: 'كَأَنَّ الجُموعَ الغُلبَ في يَومِ عُرسِ'
-        }
-      ]
-    },
-    {
-      id: 'darwish-ala-hazihi-al-ard',
-      poetId: 'mahmoud-darwish',
-      poetName: 'محمود درويش',
-      eraId: 'modern',
-      eraName: 'العصر الحديث والمعاصر',
-      title: 'عَلى هَذِهِ الأَرْضِ مَا يَسْتَحِقُّ الحَيَاةْ',
-      meter: 'تفعيلة (المتقارب)',
-      rhyme: 'متنوع',
-      verses: [
-        {
-          num: 1,
-          sadr: 'عَلى هَذِهِ الأَرْضِ مَا يَسْتَحِقُّ الحَيَاةْ',
-          ajuz: 'تَرَدُّدُ إِبْرِيلَ، رَائِحَةُ الخُبْزِ فِي الفَجْرِ'
-        },
-        {
-          num: 2,
-          sadr: 'آرَاءُ امْرَأَةٍ فِي الرِّجَالِ، كِتَابَاتُ إِسْخِيلُوسَ',
-          ajuz: 'أَوَّلُ الحُبِّ، عُشْبٌ عَلَى حَجَرٍ، أُمَّهَاتٌ تَقِفْنَ عَلَى خَيْطِ نَايٍ'
-        },
-        {
-          num: 3,
-          sadr: 'وَخَوْفُ الغُزَاةِ مِنَ الذِّكْرَيَاتْ',
-          ajuz: 'عَلَى هَذِهِ الأَرْضِ سَيِّدَةُ الأَرْضِ.. كَانَتْ تُسَمَّى فِلَسْطِين.. صَارَتْ تُسَمَّى فِلَسْطِين'
-        }
-      ]
-    }
-  ]
-};
+const DEFAULT_BASE_URL = 'https://api.aldiwan.net/api/v1';
 
 // ==========================================
-// 2. ApiClient with LocalStorage & Fallback
+// 1. ApiClient (100% Live API Communication)
 // ==========================================
 class ApiClient {
   constructor() {
@@ -520,20 +20,24 @@ class ApiClient {
     const saved = localStorage.getItem(this.storageKey);
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        return {
+          baseUrl: (parsed.baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, ''),
+          token: parsed.token ? parsed.token.trim() : ''
+        };
       } catch (e) {
         console.error('Failed to parse stored API config', e);
       }
     }
     return {
-      baseUrl: 'https://api.aldiwan.net/v1',
+      baseUrl: DEFAULT_BASE_URL,
       token: ''
     };
   }
 
   saveConfig(baseUrl, token) {
     this.config = {
-      baseUrl: baseUrl.replace(/\/+$/, ''),
+      baseUrl: (baseUrl || DEFAULT_BASE_URL).trim().replace(/\/+$/, ''),
       token: token ? token.trim() : ''
     };
     localStorage.setItem(this.storageKey, JSON.stringify(this.config));
@@ -542,7 +46,7 @@ class ApiClient {
   resetConfig() {
     localStorage.removeItem(this.storageKey);
     this.config = {
-      baseUrl: 'https://api.aldiwan.net/v1',
+      baseUrl: DEFAULT_BASE_URL,
       token: ''
     };
   }
@@ -558,12 +62,63 @@ class ApiClient {
     return headers;
   }
 
+  /**
+   * Universal fetch wrapper with timeout, CORS & HTTP error management
+   */
+  async request(endpoint, options = {}) {
+    const url = endpoint.startsWith('http') 
+      ? endpoint 
+      : `${this.config.baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+      
+    const controller = new AbortController();
+    const timeoutMs = options.timeout || 10000;
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const response = await fetch(url, {
+        method: options.method || 'GET',
+        headers: { ...this.getHeaders(), ...(options.headers || {}) },
+        body: options.body ? JSON.stringify(options.body) : undefined,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        if (response.status === 403) {
+          throw new Error('تم رفض الوصول (403 Forbidden). قد يتطلب الخادم رمز مصادقة (Bearer Token) في الإعدادات.');
+        }
+        if (response.status === 401) {
+          throw new Error('غير مصرح (401 Unauthorized). رمز المصادقة غير صالح أو منتهي الصلاحية.');
+        }
+        if (response.status === 404) {
+          throw new Error('المورد المطلوب غير موجود على الخادم (404 Not Found).');
+        }
+        throw new Error(`استجاب الخادم برمز خطأ (${response.status} ${response.statusText}).`);
+      }
+
+      const json = await response.json();
+      return json?.data !== undefined ? json.data : json;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        throw new Error(`انتهت مهلة الاتصال بالخادم (${timeoutMs / 1000} ثوانٍ). يرجى التأكد من استجابة الرابط: ${this.config.baseUrl}`);
+      }
+      if (err instanceof TypeError || (err.message && err.message.toLowerCase().includes('failed to fetch'))) {
+        throw new Error(`تعذر الاتصال بالخادم (${this.config.baseUrl}). قد يرجع ذلك لقيود CORS في المتصفح أو انقطاع الاتصال.`);
+      }
+      throw err;
+    }
+  }
+
+  /**
+   * Probes GET /eras as standard live check endpoint
+   */
   async ping() {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-      
-      const res = await fetch(`${this.config.baseUrl}/ping`, {
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+      const res = await fetch(`${this.config.baseUrl}/eras`, {
         method: 'GET',
         headers: this.getHeaders(),
         signal: controller.signal
@@ -574,178 +129,126 @@ class ApiClient {
         this.isOnlineApi = true;
         return { success: true, message: 'الاتصال بالخادم ناجح (200 OK)' };
       }
-      return { success: false, message: `استجاب الخادم برمز: ${res.status}` };
-    } catch (err) {
+
       this.isOnlineApi = false;
+      if (res.status === 403) {
+        return { 
+          success: false, 
+          status: 403, 
+          message: 'الخادم يتطلب رمز مصادقة (403 Forbidden)' 
+        };
+      }
       return { 
         success: false, 
-        message: 'تعذر الاتصال المباشر بالخادم (قد يكون CORS أو غير متوفر حالياً)؛ سيعمل التطبيق تلقائياً بالبيانات المحلية عالية الجودة.' 
+        status: res.status, 
+        message: `استجاب الخادم برمز: ${res.status}` 
+      };
+    } catch (err) {
+      this.isOnlineApi = false;
+      return {
+        success: false,
+        message: 'تعذر الاتصال المباشر بالخادم (قد يكون بسبب قيود CORS للمتصفح أو عدم توفر النطاق)'
       };
     }
   }
 
   async getEras() {
-    if (this.isOnlineApi) {
-      try {
-        const res = await fetch(`${this.config.baseUrl}/eras`, { headers: this.getHeaders() });
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length) return data;
-        }
-      } catch (e) {
-        console.warn('API error fetching eras, falling back to mock data', e);
-      }
-    }
-    return MOCK_DATA.eras;
+    const data = await this.request('/eras');
+    return Array.isArray(data) ? data : (data?.eras || []);
   }
 
   async getPoets(eraId = 'all') {
-    if (this.isOnlineApi) {
-      try {
-        const url = eraId && eraId !== 'all' 
-          ? `${this.config.baseUrl}/poets?era=${encodeURIComponent(eraId)}` 
-          : `${this.config.baseUrl}/poets`;
-        const res = await fetch(url, { headers: this.getHeaders() });
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length) return data;
-        }
-      } catch (e) {
-        console.warn('API error fetching poets, falling back to mock data', e);
-      }
-    }
-
-    if (!eraId || eraId === 'all') {
-      return MOCK_DATA.poets;
-    }
-    return MOCK_DATA.poets.filter(p => p.eraId === eraId);
+    const endpoint = (eraId && eraId !== 'all') 
+      ? `/poets?era=${encodeURIComponent(eraId)}` 
+      : '/poets';
+    const data = await this.request(endpoint);
+    return Array.isArray(data) ? data : (data?.poets || data?.items || []);
   }
 
   async getPoetPoems(poetId) {
-    if (this.isOnlineApi) {
-      try {
-        const res = await fetch(`${this.config.baseUrl}/poets/${poetId}/poems`, { headers: this.getHeaders() });
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length) return data;
-        }
-      } catch (e) {
-        console.warn('API error fetching poet poems, falling back', e);
-      }
-    }
-    return MOCK_DATA.poems.filter(p => p.poetId === poetId);
+    const data = await this.request(`/poets/${encodeURIComponent(poetId)}/poems`);
+    return Array.isArray(data) ? data : (data?.poems || data?.items || []);
   }
 
   async getPoem(poemId) {
-    if (this.isOnlineApi) {
-      try {
-        const res = await fetch(`${this.config.baseUrl}/poems/${poemId}`, { headers: this.getHeaders() });
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.title) return data;
-        }
-      } catch (e) {
-        console.warn('API error fetching poem, falling back', e);
-      }
-    }
-    return MOCK_DATA.poems.find(p => p.id === poemId);
+    const data = await this.request(`/poems/${encodeURIComponent(poemId)}`);
+    return data?.poem || data;
   }
 
   async getPoemsCount() {
     try {
-      const res = await fetch(`${this.config.baseUrl}/poems/count`, { headers: this.getHeaders() });
-      if (res.ok) {
-        const json = await res.json();
-        const count = json?.data?.count ?? json?.count ?? (typeof json?.data === 'number' ? json.data : null);
-        if (count !== null && count !== undefined && !isNaN(count)) {
-          return Number(count);
-        }
+      const data = await this.request('/poems/count', { timeout: 4000 });
+      const count = data?.count ?? (typeof data === 'number' ? data : null);
+      if (count !== null && count !== undefined && !isNaN(count)) {
+        return Number(count);
       }
     } catch (e) {
-      console.warn('API error fetching poems count, fallback to default', e);
+      // Non-fatal if count endpoint doesn't exist
     }
     return null;
   }
 
-  async updatePoemCount(elementId = 'statPoemsCount') {
-    const count = await this.getPoemsCount();
-    if (count !== null && count !== undefined) {
-      const el = document.getElementById(elementId);
-      if (el) {
-        const formatted = Number(count).toLocaleString('en-US');
-        el.textContent = `+${formatted}`;
-        el.title = `إجمالي القصائد الدقيق من خادم الديوان: ${formatted} قصيدة`;
-      }
-      return count;
-    }
-    return null;
-  }
-
-  search(query) {
+  async search(query) {
     if (!query || !query.trim()) return [];
-    const q = query.trim().toLowerCase();
-    const cleanQ = removeDiacritics(q);
+    const q = query.trim();
+    const data = await this.request(`/search?q=${encodeURIComponent(q)}`, { timeout: 6000 });
 
-    const results = [];
+    // Handle varied search response formats
+    let rawList = [];
+    if (Array.isArray(data)) {
+      rawList = data;
+    } else if (data && typeof data === 'object') {
+      if (Array.isArray(data.results)) {
+        rawList = data.results;
+      } else {
+        const poets = Array.isArray(data.poets) ? data.poets.map(p => ({ ...p, type: 'poet' })) : [];
+        const poems = Array.isArray(data.poems) ? data.poems.map(p => ({ ...p, type: 'poem' })) : [];
+        const verses = Array.isArray(data.verses) ? data.verses.map(v => ({ ...v, type: 'verse' })) : [];
+        rawList = [...poets, ...poems, ...verses];
+      }
+    }
 
-    // Search poets
-    MOCK_DATA.poets.forEach(poet => {
-      const cleanName = removeDiacritics(poet.name.toLowerCase());
-      if (cleanName.includes(cleanQ) || poet.title.toLowerCase().includes(cleanQ)) {
-        results.push({
+    return rawList.map(item => {
+      if (item.type === 'poet' || (!item.verses && item.bio)) {
+        return {
           type: 'poet',
-          title: poet.name,
-          subtitle: `${poet.title} • ${poet.eraName}`,
-          data: poet
-        });
+          title: item.name || item.title,
+          subtitle: `${item.title || ''} ${item.era_name || item.eraName ? '• ' + (item.era_name || item.eraName) : ''}`.trim(),
+          data: item
+        };
       }
-    });
-
-    // Search poems & verses
-    MOCK_DATA.poems.forEach(poem => {
-      const cleanPoemTitle = removeDiacritics(poem.title.toLowerCase());
-      if (cleanPoemTitle.includes(cleanQ)) {
-        results.push({
-          type: 'poem',
-          title: poem.title,
-          subtitle: `${poem.poetName} • ${poem.meter}`,
-          data: poem
-        });
-        return;
+      if (item.type === 'verse' || item.sadr) {
+        return {
+          type: 'verse',
+          title: `${item.sadr} ... ${item.ajuz || ''}`,
+          subtitle: item.poem_title ? `من قصيدة: «${item.poem_title}»` : (item.poet_name || ''),
+          data: item
+        };
       }
-
-      // Check inside verses
-      for (const verse of poem.verses) {
-        const cleanSadr = removeDiacritics(verse.sadr.toLowerCase());
-        const cleanAjuz = removeDiacritics(verse.ajuz.toLowerCase());
-        if (cleanSadr.includes(cleanQ) || cleanAjuz.includes(cleanQ)) {
-          results.push({
-            type: 'verse',
-            title: `${verse.sadr} ... ${verse.ajuz}`,
-            subtitle: `من قصيدة: «${poem.title}» - ${poem.poetName}`,
-            data: poem,
-            matchedVerse: verse
-          });
-          break; // Avoid flooding with multiple verses from same poem
-        }
-      }
-    });
-
-    return results.slice(0, 8);
+      return {
+        type: 'poem',
+        title: item.title || item.name,
+        subtitle: `${item.poet_name || item.poetName || ''} ${item.meter ? '• ' + item.meter : ''}`.trim(),
+        data: item
+      };
+    }).slice(0, 10);
   }
 }
 
 // ==========================================
-// 3. Helper Functions (Diacritics, Toast, Canvas)
+// 2. Helper Functions (Diacritics, Toast, Escaping)
 // ==========================================
 
-/**
- * Removes Arabic diacritics (Harakat, Tanween, Shadda, Sukun)
- * Regex range: \u064B - \u0652 + \u0670 (dagger alif) + \u0656-\u065F
- */
 function removeDiacritics(text) {
   if (!text) return '';
   return text.replace(/[\u064B-\u065F\u0670]/g, '');
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 function showToast(message, type = 'info') {
@@ -767,7 +270,7 @@ function showToast(message, type = 'info') {
 
   toast.innerHTML = `
     <i data-lucide="${iconName}" class="w-4 h-4 flex-shrink-0"></i>
-    <span>${message}</span>
+    <span>${escapeHtml(message)}</span>
   `;
 
   container.appendChild(toast);
@@ -780,21 +283,23 @@ function showToast(message, type = 'info') {
   setTimeout(() => {
     toast.classList.add('opacity-0', 'translate-y-2');
     setTimeout(() => toast.remove(), 300);
-  }, 3200);
+  }, 3500);
 }
 
 // ==========================================
-// 4. Main Application Controller
+// 3. Main Application Controller (100% Dynamic)
 // ==========================================
 class DiwanApp {
   constructor() {
     this.api = new ApiClient();
+    this.eras = [];
     this.currentEraId = 'all';
     this.currentPoet = null;
     this.currentPoem = null;
     this.showDiacritics = true;
     this.fontSizeScale = 1.0;
     this.currentSelectedVerse = null;
+    this.searchDebounceTimer = null;
 
     this.initElements();
     this.initEventListeners();
@@ -931,8 +436,8 @@ class DiwanApp {
 
     this.copyFullPoemBtn.addEventListener('click', () => {
       if (!this.currentPoem) return;
-      let text = `«${this.currentPoem.title}»\nالشاعر: ${this.currentPoem.poetName}\n${this.currentPoem.meter}\n\n`;
-      this.currentPoem.verses.forEach(v => {
+      let text = `«${this.currentPoem.title}»\nالشاعر: ${this.currentPoem.poetName}\n${this.currentPoem.meter || ''}\n\n`;
+      (this.currentPoem.verses || []).forEach(v => {
         const sadr = this.showDiacritics ? v.sadr : removeDiacritics(v.sadr);
         const ajuz = this.showDiacritics ? v.ajuz : removeDiacritics(v.ajuz);
         text += `${sadr} ... ${ajuz}\n`;
@@ -943,12 +448,15 @@ class DiwanApp {
       });
     });
 
-    // Search events
+    // Search events (live dynamic search)
     this.globalSearchInput.addEventListener('input', (e) => {
       const val = e.target.value;
+      clearTimeout(this.searchDebounceTimer);
       if (val.trim()) {
         this.clearSearchBtn.classList.remove('hidden');
-        this.performLiveSearch(val);
+        this.searchDebounceTimer = setTimeout(() => {
+          this.performLiveSearch(val);
+        }, 350);
       } else {
         this.clearSearchBtn.classList.add('hidden');
         this.searchDropdown.classList.add('hidden');
@@ -982,10 +490,9 @@ class DiwanApp {
   }
 
   async startApp() {
-    this.renderErasTabs();
-    await this.loadPoets();
+    await this.loadEras();
+    await this.loadPoets(this.currentEraId);
     this.checkApiStatusQuietly();
-    if (window.lucide) lucide.createIcons();
   }
 
   resetToHome() {
@@ -996,7 +503,7 @@ class DiwanApp {
     this.poetPoemsSection.classList.add('hidden');
     this.switchView('catalog');
     this.renderErasTabs();
-    this.loadPoets();
+    this.loadPoets('all');
     this.updateBreadcrumbs();
   }
 
@@ -1016,7 +523,7 @@ class DiwanApp {
 
   updateBreadcrumbs() {
     if (this.currentEraId && this.currentEraId !== 'all') {
-      const eraObj = MOCK_DATA.eras.find(e => e.id === this.currentEraId);
+      const eraObj = this.eras.find(e => (e.id || e.slug) === this.currentEraId);
       this.crumbEra.textContent = eraObj ? eraObj.name : 'العصور الأدبية';
     } else {
       this.crumbEra.textContent = 'كافة العصور';
@@ -1041,25 +548,176 @@ class DiwanApp {
     }
   }
 
+  // ==========================================
+  // Skeletons & Error Cards
+  // ==========================================
+
+  renderErasSkeleton() {
+    this.erasTabsContainer.innerHTML = Array(6).fill(0).map(() => `
+      <div class="h-9 w-28 rounded-xl bg-[#18202c] border border-[#2a374a] animate-pulse flex-shrink-0"></div>
+    `).join('');
+  }
+
+  renderPoetsSkeleton() {
+    this.poetsGrid.innerHTML = Array(8).fill(0).map(() => `
+      <div class="p-5 rounded-2xl bg-[#18202c]/60 border border-[#2a374a] animate-pulse space-y-3">
+        <div class="flex justify-between items-center">
+          <div class="w-12 h-12 rounded-xl bg-slate-800"></div>
+          <div class="w-16 h-5 rounded-full bg-slate-800"></div>
+        </div>
+        <div class="h-5 w-2/3 bg-slate-800 rounded"></div>
+        <div class="h-3 w-1/2 bg-slate-800/70 rounded"></div>
+        <div class="h-3 w-full bg-slate-800/50 rounded"></div>
+        <div class="h-3 w-4/5 bg-slate-800/50 rounded"></div>
+        <div class="pt-3 border-t border-[#2a374a]/60 flex justify-between">
+          <div class="h-4 w-16 bg-slate-800 rounded"></div>
+          <div class="h-4 w-20 bg-slate-800 rounded"></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  renderPoetPoemsSkeleton() {
+    this.poetPoemsGrid.innerHTML = Array(6).fill(0).map(() => `
+      <div class="p-5 rounded-xl bg-[#18202c]/60 border border-[#2a374a] animate-pulse space-y-3">
+        <div class="flex justify-between">
+          <div class="h-4 w-20 bg-slate-800 rounded"></div>
+          <div class="h-4 w-12 bg-slate-800 rounded"></div>
+        </div>
+        <div class="h-5 w-3/4 bg-slate-800 rounded"></div>
+        <div class="h-3 w-full bg-slate-800/60 rounded"></div>
+        <div class="pt-3 border-t border-[#2a374a]/60 flex justify-between">
+          <div class="h-4 w-24 bg-slate-800 rounded"></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  renderPoemReaderSkeleton() {
+    this.versesListContainer.innerHTML = Array(8).fill(0).map((_, i) => `
+      <div class="p-4 rounded-xl bg-[#18202c]/50 border border-[#2a374a] animate-pulse flex items-center justify-between gap-4">
+        <div class="w-8 h-8 rounded-lg bg-slate-800 flex-shrink-0"></div>
+        <div class="flex-1 space-y-2">
+          <div class="h-4 w-5/6 bg-slate-800 rounded mx-auto"></div>
+        </div>
+        <div class="w-16 h-8 rounded-lg bg-slate-800 flex-shrink-0"></div>
+      </div>
+    `).join('');
+  }
+
+  renderErrorCard(container, message, retryCallback) {
+    container.innerHTML = `
+      <div class="col-span-full my-6 p-8 rounded-2xl bg-[#18202c]/90 border border-rose-900/60 text-center max-w-xl mx-auto shadow-2xl space-y-4">
+        <div class="w-14 h-14 rounded-2xl bg-rose-950/60 border border-rose-800/60 flex items-center justify-center mx-auto text-rose-400">
+          <i data-lucide="wifi-off" class="w-7 h-7"></i>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-lg font-bold text-white font-kufi">تعذر الاتصال بخادم الديوان</h3>
+          <p class="text-xs text-slate-300 leading-relaxed max-w-md mx-auto">
+            ${escapeHtml(message)}
+          </p>
+          <p class="text-[11px] text-slate-500">
+            قد يرجع ذلك إلى قيود أمان المتصفح (CORS)، عدم توفر السيرفر، أو الحاجة إلى إدخال رمز مصادقة (Bearer Token).
+          </p>
+        </div>
+        <div class="flex items-center justify-center gap-3 pt-2">
+          <button class="retry-btn px-4 py-2 rounded-xl bg-gradient-to-r from-[#c5a059] to-[#9b7a37] text-slate-950 text-xs font-bold hover:brightness-110 flex items-center gap-1.5 transition-all shadow-lg shadow-[#c5a059]/20">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            <span>إعادة المحاولة</span>
+          </button>
+          <button class="settings-btn px-4 py-2 rounded-xl bg-[#121924] border border-[#2a374a] text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
+            <i data-lucide="settings" class="w-4 h-4 text-[#c5a059]"></i>
+            <span>إعدادات الـ API</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    const retryBtn = container.querySelector('.retry-btn');
+    if (retryBtn && retryCallback) {
+      retryBtn.addEventListener('click', () => retryCallback());
+    }
+
+    const settingsBtn = container.querySelector('.settings-btn');
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', () => this.openSettings());
+    }
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  // ==========================================
+  // Data Fetching & Rendering
+  // ==========================================
+
+  async loadEras() {
+    this.renderErasSkeleton();
+    try {
+      const data = await this.api.getEras();
+      this.eras = Array.isArray(data) ? data : [];
+
+      if (this.eras.length === 0) {
+        this.erasTabsContainer.innerHTML = `
+          <div class="text-xs text-slate-400 py-2">لا توجد عصور متوفرة على الخادم حالياً.</div>
+        `;
+        return;
+      }
+
+      this.statErasCount.textContent = `${this.eras.length}`;
+      this.renderErasTabs();
+    } catch (err) {
+      console.error('Error fetching eras:', err);
+      this.statErasCount.textContent = '-';
+      this.renderErrorCard(this.erasTabsContainer, err.message, () => this.loadEras());
+    }
+  }
+
   renderErasTabs() {
+    if (!this.eras || this.eras.length === 0) return;
     this.erasTabsContainer.innerHTML = '';
-    MOCK_DATA.eras.forEach(era => {
-      const isSelected = era.id === this.currentEraId;
+
+    // "All Eras" Tab
+    const isAll = this.currentEraId === 'all';
+    const allBtn = document.createElement('button');
+    allBtn.className = `px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 border ${
+      isAll
+        ? 'bg-[#c5a059] text-slate-950 border-[#c5a059] shadow-lg shadow-[#c5a059]/20 font-bold'
+        : 'bg-[#18202c] text-slate-300 border-[#2a374a] hover:border-[#c5a059]/50 hover:text-white'
+    }`;
+    allBtn.innerHTML = `<span>كافة العصور</span>`;
+    allBtn.addEventListener('click', () => {
+      this.currentEraId = 'all';
+      this.renderErasTabs();
+      this.loadPoets('all');
+      this.poetPoemsSection.classList.add('hidden');
+      this.updateBreadcrumbs();
+    });
+    this.erasTabsContainer.appendChild(allBtn);
+
+    // Dynamic Eras from Live API
+    this.eras.forEach(era => {
+      const eraId = String(era.id ?? era.slug);
+      const isSelected = eraId === String(this.currentEraId);
       const btn = document.createElement('button');
       btn.className = `px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 border ${
         isSelected
           ? 'bg-[#c5a059] text-slate-950 border-[#c5a059] shadow-lg shadow-[#c5a059]/20 font-bold'
           : 'bg-[#18202c] text-slate-300 border-[#2a374a] hover:border-[#c5a059]/50 hover:text-white'
       }`;
+
+      const countBadge = era.poets_count || era.count
+        ? `<span class="text-[10px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-slate-950/20 text-slate-950' : 'bg-[#121924] text-slate-400'}">${era.poets_count || era.count}</span>`
+        : '';
+
       btn.innerHTML = `
-        <span>${era.name}</span>
-        <span class="text-[10px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-slate-950/20 text-slate-950' : 'bg-[#121924] text-slate-400'}">${era.count}</span>
+        <span>${escapeHtml(era.name || era.title)}</span>
+        ${countBadge}
       `;
 
       btn.addEventListener('click', () => {
-        this.currentEraId = era.id;
+        this.currentEraId = eraId;
         this.renderErasTabs();
-        this.loadPoets();
+        this.loadPoets(eraId);
         this.poetPoemsSection.classList.add('hidden');
         this.updateBreadcrumbs();
       });
@@ -1068,26 +726,36 @@ class DiwanApp {
     });
   }
 
-  async loadPoets() {
-    this.poetsGrid.innerHTML = `
-      <div class="col-span-full py-12 text-center text-slate-400">
-        <div class="inline-block animate-spin w-6 h-6 border-2 border-[#c5a059] border-t-transparent rounded-full mb-2"></div>
-        <p class="text-xs">جاري تحميل الشعراء...</p>
-      </div>
-    `;
+  async loadPoets(eraId = 'all') {
+    this.renderPoetsSkeleton();
+    this.poetsCountLabel.textContent = '...';
 
-    const poets = await this.api.getPoets(this.currentEraId);
+    try {
+      const poets = await this.api.getPoets(eraId);
+      this.renderPoetsList(poets, eraId);
+      
+      // Update stats
+      if (eraId === 'all' && poets && poets.length) {
+        this.statPoetsCount.textContent = `+${poets.length.toLocaleString('en-US')}`;
+      }
+    } catch (err) {
+      console.error('Error fetching poets:', err);
+      this.poetsCountLabel.textContent = 'خطأ';
+      this.renderErrorCard(this.poetsGrid, err.message, () => this.loadPoets(eraId));
+    }
+  }
+
+  renderPoetsList(poets, eraId) {
+    const eraObj = this.eras.find(e => String(e.id || e.slug) === String(eraId));
+    this.poetsSectionTitle.textContent = eraObj ? `شعراء ${eraObj.name || eraObj.title}` : 'الشعراء';
     this.poetsCountLabel.textContent = `${poets.length} من الشعراء`;
-    
-    const eraObj = MOCK_DATA.eras.find(e => e.id === this.currentEraId);
-    this.poetsSectionTitle.textContent = eraObj ? `شعراء ${eraObj.name}` : 'الشعراء';
 
     this.poetsGrid.innerHTML = '';
 
-    if (poets.length === 0) {
+    if (!poets || poets.length === 0) {
       this.poetsGrid.innerHTML = `
         <div class="col-span-full py-12 text-center text-slate-400 border border-dashed border-[#2a374a] rounded-2xl">
-          <p>لا يوجد شعراء مدرجين في هذا التصنيف حالياً.</p>
+          <p>لا يوجد شعراء مدرجون في هذا التصنيف على الخادم حالياً.</p>
         </div>
       `;
       return;
@@ -1096,26 +764,36 @@ class DiwanApp {
     poets.forEach(poet => {
       const card = document.createElement('div');
       card.className = 'group p-5 rounded-2xl bg-[#18202c]/80 border border-[#2a374a] hover:border-[#c5a059]/60 hover:bg-[#1f2a3a] transition-all duration-300 flex flex-col justify-between cursor-pointer shadow-lg hover:shadow-2xl hover:-translate-y-1';
+      
+      const eraName = poet.era_name || poet.eraName || poet.era?.name || (eraObj ? eraObj.name : '');
+      const poemsCount = poet.poems_count || poet.poemsCount || '';
+
       card.innerHTML = `
         <div>
           <div class="flex items-start justify-between gap-3 mb-3">
             <div class="w-12 h-12 rounded-xl bg-[#121924] border border-[#2a374a] flex items-center justify-center text-2xl group-hover:scale-110 group-hover:border-[#c5a059]/40 transition-all">
               ${poet.avatar || '📜'}
             </div>
-            <span class="text-[11px] px-2 py-0.5 rounded-full bg-[#c5a059]/15 text-[#dfc185] border border-[#c5a059]/25 font-medium">
-              ${poet.eraName}
-            </span>
+            ${eraName ? `
+              <span class="text-[11px] px-2 py-0.5 rounded-full bg-[#c5a059]/15 text-[#dfc185] border border-[#c5a059]/25 font-medium">
+                ${escapeHtml(eraName)}
+              </span>
+            ` : ''}
           </div>
           <h4 class="text-base font-bold font-kufi text-white group-hover:text-[#dfc185] transition-colors mb-1">
-            ${poet.name}
+            ${escapeHtml(poet.name || poet.title)}
           </h4>
-          <p class="text-xs text-[#c5a059] font-medium mb-2">${poet.title}</p>
-          <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed font-light">${poet.bio}</p>
+          ${poet.title && poet.title !== poet.name ? `
+            <p class="text-xs text-[#c5a059] font-medium mb-2">${escapeHtml(poet.title)}</p>
+          ` : ''}
+          <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed font-light">
+            ${escapeHtml(poet.bio || poet.description || 'شاعر عربي أصيل')}
+          </p>
         </div>
         <div class="mt-4 pt-3 border-t border-[#2a374a]/60 flex items-center justify-between text-xs text-slate-400">
           <span class="flex items-center gap-1">
             <i data-lucide="book" class="w-3.5 h-3.5 text-[#c5a059]"></i>
-            ${poet.poemsCount || 1} قصائد
+            ${poemsCount ? `${poemsCount} قصيدة` : 'استعراض القصائد'}
           </span>
           <span class="text-[#dfc185] flex items-center gap-1 font-semibold group-hover:translate-x-[-4px] transition-transform">
             تصفح القصائد <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
@@ -1135,34 +813,42 @@ class DiwanApp {
 
   async loadPoetPoems(poet) {
     this.currentPoet = poet;
-    this.selectedPoetNameTitle.textContent = `قصائد ${poet.name}`;
-    this.selectedPoetBio.textContent = poet.bio;
+    this.selectedPoetNameTitle.textContent = `قصائد ${poet.name || poet.title}`;
+    this.selectedPoetBio.textContent = poet.bio || poet.description || '';
     this.poetPoemsSection.classList.remove('hidden');
     this.updateBreadcrumbs();
+    this.renderPoetPoemsSkeleton();
 
-    this.poetPoemsGrid.innerHTML = `
-      <div class="col-span-full py-8 text-center text-slate-400">
-        <div class="inline-block animate-spin w-5 h-5 border-2 border-[#c5a059] border-t-transparent rounded-full mb-1"></div>
-        <p class="text-xs">جاري تحميل القصائد...</p>
-      </div>
-    `;
+    // Scroll to poet poems view smoothly
+    this.poetPoemsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    const poems = await this.api.getPoetPoems(poet.id);
+    try {
+      const poems = await this.api.getPoetPoems(poet.id || poet.slug);
+      this.renderPoetPoemsList(poems, poet);
+    } catch (err) {
+      console.error('Error fetching poet poems:', err);
+      this.renderErrorCard(this.poetPoemsGrid, err.message, () => this.loadPoetPoems(poet));
+    }
+  }
+
+  renderPoetPoemsList(poems, poet) {
     this.poetPoemsGrid.innerHTML = '';
 
     if (!poems || poems.length === 0) {
       this.poetPoemsGrid.innerHTML = `
         <div class="col-span-full py-8 text-center text-slate-400 text-xs">
-          لم يتم العثور على قصائد مسجلة لهذا الشاعر حالياً.
+          لم يتم العثور على قصائد مسجلة لهذا الشاعر على الخادم حالياً.
         </div>
       `;
       return;
     }
 
     poems.forEach(poem => {
-      const firstVerse = poem.verses && poem.verses[0] 
-        ? `${poem.verses[0].sadr} ... ${poem.verses[0].ajuz}` 
-        : '';
+      const meter = poem.meter || poem.bahr || 'بحر شعري';
+      const versesCount = poem.verses_count || poem.versesCount || (Array.isArray(poem.verses) ? poem.verses.length : '');
+      const firstVerseText = Array.isArray(poem.verses) && poem.verses[0]
+        ? `${poem.verses[0].sadr || ''} ... ${poem.verses[0].ajuz || ''}`
+        : (poem.snippet || poem.first_verse || '');
 
       const card = document.createElement('div');
       card.className = 'group p-5 rounded-xl bg-[#18202c] border border-[#2a374a] hover:border-[#c5a059] transition-all cursor-pointer flex flex-col justify-between hover:bg-[#1f2a3a]';
@@ -1170,18 +856,22 @@ class DiwanApp {
         <div>
           <div class="flex items-center justify-between gap-2 mb-2">
             <span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-mono">
-              ${poem.meter}
+              ${escapeHtml(meter)}
             </span>
-            <span class="text-xs text-slate-400">
-              ${poem.verses.length} أبيات
-            </span>
+            ${versesCount ? `
+              <span class="text-xs text-slate-400">
+                ${versesCount} بيتاً
+              </span>
+            ` : ''}
           </div>
           <h4 class="text-base font-bold font-kufi text-white group-hover:text-[#dfc185] transition-colors mb-2">
-            ${poem.title}
+            ${escapeHtml(poem.title || poem.name)}
           </h4>
-          <p class="text-xs text-slate-400 font-amiri leading-relaxed line-clamp-2 italic">
-            «${firstVerse}»
-          </p>
+          ${firstVerseText ? `
+            <p class="text-xs text-slate-400 font-amiri leading-relaxed line-clamp-2 italic">
+              «${escapeHtml(firstVerseText)}»
+            </p>
+          ` : ''}
         </div>
         <div class="mt-4 pt-3 border-t border-[#2a374a]/60 flex items-center justify-between text-xs font-semibold text-[#c5a059]">
           <span>فتح قارئ القصيدة</span>
@@ -1190,35 +880,83 @@ class DiwanApp {
       `;
 
       card.addEventListener('click', () => {
-        this.openPoemReader(poem);
+        this.openPoemReader(poem, poet);
       });
 
       this.poetPoemsGrid.appendChild(card);
     });
 
     if (window.lucide) lucide.createIcons();
-
-    // Scroll gently to poems section
-    this.poetPoemsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  async openPoemReader(poem) {
-    this.currentPoem = poem;
-    this.currentPoet = {
-      id: poem.poetId,
-      name: poem.poetName,
-      eraName: poem.eraName
+  async openPoemReader(poemSummary, poetSummary) {
+    this.switchView('reader');
+    this.renderPoemReaderSkeleton();
+
+    // Populate tentative header data
+    const poetName = poetSummary?.name || poemSummary?.poet_name || poemSummary?.poetName || (this.currentPoet ? this.currentPoet.name : '');
+    const eraName = poetSummary?.era_name || poemSummary?.era_name || (this.currentPoet ? this.currentPoet.eraName : '');
+
+    this.poemTitle.textContent = poemSummary.title || poemSummary.name || 'تحميل القصيدة...';
+    this.poemPoetName.textContent = poetName;
+    this.poemEraBadge.textContent = eraName || '-';
+    this.poemMeterBadge.textContent = poemSummary.meter || poemSummary.bahr || '-';
+    this.poemVersesCountBadge.textContent = '-';
+
+    this.currentPoem = {
+      id: poemSummary.id || poemSummary.slug,
+      title: poemSummary.title || poemSummary.name,
+      poetName: poetName,
+      poetId: poetSummary?.id || poemSummary?.poet_id,
+      eraName: eraName,
+      meter: poemSummary.meter || poemSummary.bahr,
+      verses: []
     };
 
-    this.poemTitle.textContent = poem.title;
-    this.poemPoetName.textContent = poem.poetName;
-    this.poemEraBadge.textContent = poem.eraName || 'أدب عربي';
-    this.poemMeterBadge.textContent = poem.meter || 'شعر عربي';
-    this.poemVersesCountBadge.textContent = `${poem.verses.length} بيتاً`;
-
-    this.renderVerses();
-    this.switchView('reader');
     this.updateBreadcrumbs();
+
+    try {
+      let fullPoem = poemSummary;
+      // Fetch full poem details if verses aren't embedded yet
+      if (!Array.isArray(poemSummary.verses) || poemSummary.verses.length === 0) {
+        fullPoem = await this.api.getPoem(poemSummary.id || poemSummary.slug);
+      }
+
+      this.currentPoem.title = fullPoem.title || fullPoem.name || this.currentPoem.title;
+      this.currentPoem.poetName = fullPoem.poet_name || fullPoem.poetName || poetName;
+      this.currentPoem.meter = fullPoem.meter || fullPoem.bahr || this.currentPoem.meter;
+      this.currentPoem.eraName = fullPoem.era_name || fullPoem.eraName || eraName;
+
+      // Normalize verses array
+      const rawVerses = fullPoem.verses || fullPoem.lines || [];
+      this.currentPoem.verses = rawVerses.map((v, idx) => {
+        if (typeof v === 'string') {
+          const parts = v.split(/\s*[\.\*…]{2,}\s*|\t+/);
+          return {
+            num: idx + 1,
+            sadr: parts[0] || v,
+            ajuz: parts[1] || ''
+          };
+        }
+        return {
+          num: v.num || v.index || (idx + 1),
+          sadr: v.sadr || v.first_hemistich || v.firstHemistich || '',
+          ajuz: v.ajuz || v.second_hemistich || v.secondHemistich || ''
+        };
+      });
+
+      this.poemTitle.textContent = this.currentPoem.title;
+      this.poemPoetName.textContent = this.currentPoem.poetName;
+      this.poemEraBadge.textContent = this.currentPoem.eraName || 'أدب عربي';
+      this.poemMeterBadge.textContent = this.currentPoem.meter || 'شعر عربي';
+      this.poemVersesCountBadge.textContent = `${this.currentPoem.verses.length} بيتاً`;
+
+      this.renderVerses();
+      this.updateBreadcrumbs();
+    } catch (err) {
+      console.error('Error fetching poem details:', err);
+      this.renderErrorCard(this.versesListContainer, err.message, () => this.openPoemReader(poemSummary, poetSummary));
+    }
   }
 
   applyFontSize() {
@@ -1232,8 +970,17 @@ class DiwanApp {
   }
 
   renderVerses() {
-    if (!this.currentPoem) return;
+    if (!this.currentPoem || !this.currentPoem.verses) return;
     this.versesListContainer.innerHTML = '';
+
+    if (this.currentPoem.verses.length === 0) {
+      this.versesListContainer.innerHTML = `
+        <div class="py-12 text-center text-slate-400 border border-dashed border-[#2a374a] rounded-2xl text-xs">
+          لا توجد أبيات مسجلة لهذه القصيدة على الخادم.
+        </div>
+      `;
+      return;
+    }
 
     this.currentPoem.verses.forEach(v => {
       const sadrText = this.showDiacritics ? v.sadr : removeDiacritics(v.sadr);
@@ -1245,9 +992,9 @@ class DiwanApp {
       row.innerHTML = `
         <div class="verse-num" title="بيت رقم ${v.num}">${v.num}</div>
         <div class="verse-text-container" style="font-size: ${1.35 * this.fontSizeScale}rem">
-          <div class="verse-sadr">${sadrText}</div>
+          <div class="verse-sadr">${escapeHtml(sadrText)}</div>
           <div class="verse-separator">✦</div>
-          <div class="verse-ajuz">${ajuzText}</div>
+          <div class="verse-ajuz">${escapeHtml(ajuzText)}</div>
         </div>
         <div class="verse-actions">
           <button class="p-2 rounded-lg bg-[#121924] border border-[#2a374a] text-slate-300 hover:text-[#dfc185] hover:border-[#c5a059] transition-all quote-btn" title="تصدير كبطاقة اقتباس">
@@ -1293,7 +1040,7 @@ class DiwanApp {
 
     this.quoteCardSadr.textContent = sadr;
     this.quoteCardAjuz.textContent = ajuz;
-    this.quoteCardPoet.textContent = `الشاعر: ${this.currentPoem.poetName} (من ${this.currentPoem.title})`;
+    this.quoteCardPoet.textContent = `الشاعر: ${this.currentPoem.poetName} (من «${this.currentPoem.title}»)`;
 
     this.quoteModal.classList.remove('hidden');
     if (window.lucide) lucide.createIcons();
@@ -1302,7 +1049,7 @@ class DiwanApp {
   copySelectedQuoteText() {
     if (!this.currentSelectedVerse) return;
     const { sadr, ajuz, poetName, poemTitle } = this.currentSelectedVerse;
-    const text = `«${sadr}\n${ajuz}»\n— ${poetName} (${poemTitle})\nعبر تطبيق روائع الديوان`;
+    const text = `«${sadr}\n${ajuz}»\n— ${poetName} (من «${poemTitle}»)\nعبر تطبيق روائع الديوان`;
     navigator.clipboard.writeText(text).then(() => {
       showToast('تم نسخ نص الاقتباس بنجاح!', 'success');
     });
@@ -1315,7 +1062,6 @@ class DiwanApp {
     const canvas = this.quoteCanvas;
     const ctx = canvas.getContext('2d');
 
-    // High resolution canvas for sharp retina download
     const width = 1200;
     const height = 750;
     canvas.width = width;
@@ -1338,7 +1084,7 @@ class DiwanApp {
     ctx.strokeStyle = 'rgba(197, 160, 89, 0.4)';
     ctx.setLineDash([8, 8]);
     ctx.strokeRect(50, 50, width - 100, height - 100);
-    ctx.setLineDash([]); // Reset dash
+    ctx.setLineDash([]);
 
     // Header ornament / title
     ctx.textAlign = 'center';
@@ -1369,7 +1115,7 @@ class DiwanApp {
     ctx.lineTo(width - 150, 570);
     ctx.stroke();
 
-    // Footer - Poet & Branding
+    // Footer
     ctx.font = 'bold 26px Cairo, sans-serif';
     ctx.fillStyle = '#e2e8f0';
     ctx.textAlign = 'right';
@@ -1388,7 +1134,6 @@ class DiwanApp {
     ctx.fillStyle = '#64748b';
     ctx.fillText('aldiwan.net', 150, 665);
 
-    // Trigger download
     try {
       const link = document.createElement('a');
       link.download = `diwan-quote-${Date.now()}.png`;
@@ -1401,71 +1146,91 @@ class DiwanApp {
     }
   }
 
-  // Live search logic
-  performLiveSearch(query) {
-    const results = this.api.search(query);
-    this.searchResultsList.innerHTML = '';
+  // ==========================================
+  // Live Dynamic Search (Server-driven)
+  // ==========================================
+  async performLiveSearch(query) {
+    this.searchResultsList.innerHTML = `
+      <div class="p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+        <div class="w-4 h-4 border-2 border-[#c5a059] border-t-transparent rounded-full animate-spin"></div>
+        <span>جاري البحث في الخادم...</span>
+      </div>
+    `;
+    this.searchDropdown.classList.remove('hidden');
 
-    if (results.length === 0) {
-      this.searchResultsList.innerHTML = `
-        <div class="p-4 text-center text-xs text-slate-400">
-          لم يتم العثور على نتائج مطابقة لـ «${query}»
-        </div>
-      `;
-      this.searchDropdown.classList.remove('hidden');
-      return;
-    }
+    try {
+      const results = await this.api.search(query);
+      this.searchResultsList.innerHTML = '';
 
-    results.forEach(res => {
-      const item = document.createElement('div');
-      item.className = 'p-3 hover:bg-[#1f2a3a] cursor-pointer flex items-center justify-between gap-3 text-right transition-colors';
-      
-      let badgeLabel = 'قصيدة';
-      let icon = 'book-open';
-      if (res.type === 'poet') {
-        badgeLabel = 'شاعر';
-        icon = 'user';
-      } else if (res.type === 'verse') {
-        badgeLabel = 'بيت شعري';
-        icon = 'feather';
+      if (!results || results.length === 0) {
+        this.searchResultsList.innerHTML = `
+          <div class="p-4 text-center text-xs text-slate-400">
+            لم يتم العثور على نتائج مطابقة لـ «${escapeHtml(query)}» في الخادم
+          </div>
+        `;
+        return;
       }
 
-      item.innerHTML = `
-        <div class="flex items-center gap-2.5 overflow-hidden">
-          <div class="w-8 h-8 rounded-lg bg-[#121924] border border-[#2a374a] flex items-center justify-center text-[#c5a059] flex-shrink-0">
-            <i data-lucide="${icon}" class="w-4 h-4"></i>
-          </div>
-          <div class="truncate">
-            <p class="text-xs font-bold text-white truncate">${res.title}</p>
-            <p class="text-[11px] text-slate-400 truncate">${res.subtitle}</p>
-          </div>
-        </div>
-        <span class="text-[10px] px-2 py-0.5 rounded bg-[#121924] text-[#dfc185] border border-[#2a374a] whitespace-nowrap">
-          ${badgeLabel}
-        </span>
-      `;
-
-      item.addEventListener('click', () => {
-        this.searchDropdown.classList.add('hidden');
-        this.globalSearchInput.value = '';
-        this.clearSearchBtn.classList.add('hidden');
-
+      results.forEach(res => {
+        const item = document.createElement('div');
+        item.className = 'p-3 hover:bg-[#1f2a3a] cursor-pointer flex items-center justify-between gap-3 text-right transition-colors';
+        
+        let badgeLabel = 'قصيدة';
+        let icon = 'book-open';
         if (res.type === 'poet') {
-          this.switchView('catalog');
-          this.loadPoetPoems(res.data);
-        } else if (res.type === 'poem' || res.type === 'verse') {
-          this.openPoemReader(res.data);
+          badgeLabel = 'شاعر';
+          icon = 'user';
+        } else if (res.type === 'verse') {
+          badgeLabel = 'بيت شعري';
+          icon = 'feather';
         }
+
+        item.innerHTML = `
+          <div class="flex items-center gap-2.5 overflow-hidden">
+            <div class="w-8 h-8 rounded-lg bg-[#121924] border border-[#2a374a] flex items-center justify-center text-[#c5a059] flex-shrink-0">
+              <i data-lucide="${icon}" class="w-4 h-4"></i>
+            </div>
+            <div class="truncate">
+              <p class="text-xs font-bold text-white truncate">${escapeHtml(res.title)}</p>
+              <p class="text-[11px] text-slate-400 truncate">${escapeHtml(res.subtitle)}</p>
+            </div>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-[#121924] text-[#dfc185] border border-[#2a374a] whitespace-nowrap">
+            ${badgeLabel}
+          </span>
+        `;
+
+        item.addEventListener('click', () => {
+          this.searchDropdown.classList.add('hidden');
+          this.globalSearchInput.value = '';
+          this.clearSearchBtn.classList.add('hidden');
+
+          if (res.type === 'poet') {
+            this.switchView('catalog');
+            this.loadPoetPoems(res.data);
+          } else {
+            this.openPoemReader(res.data, null);
+          }
+        });
+
+        this.searchResultsList.appendChild(item);
       });
 
-      this.searchResultsList.appendChild(item);
-    });
-
-    if (window.lucide) lucide.createIcons();
-    this.searchDropdown.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    } catch (err) {
+      console.error('Search error:', err);
+      this.searchResultsList.innerHTML = `
+        <div class="p-4 text-center text-xs text-rose-400 space-y-1">
+          <p>تعذر إتمام البحث عبر الخادم</p>
+          <p class="text-[10px] text-slate-400">${escapeHtml(err.message)}</p>
+        </div>
+      `;
+    }
   }
 
-  // API Settings Handlers
+  // ==========================================
+  // API Settings Handlers & Ping
+  // ==========================================
   openSettings() {
     this.apiBaseUrlInput.value = this.api.config.baseUrl;
     this.apiTokenInput.value = this.api.config.token || '';
@@ -1488,20 +1253,19 @@ class DiwanApp {
 
     this.api.saveConfig(url, token);
     this.closeSettings();
-    showToast('تم حفظ إعدادات الـ API بنجاح في المتصفح', 'success');
-    this.checkApiStatusQuietly();
+    showToast('تم حفظ إعدادات الـ API بنجاح', 'success');
+    this.startApp();
   }
 
   resetSettings() {
     this.api.resetConfig();
     this.apiBaseUrlInput.value = this.api.config.baseUrl;
     this.apiTokenInput.value = '';
-    if (this.statPoemsCount && MOCK_DATA.stats) {
-      this.statPoemsCount.textContent = MOCK_DATA.stats.poems;
-      this.statPoemsCount.removeAttribute('title');
-    }
+    this.statErasCount.textContent = '-';
+    this.statPoetsCount.textContent = '-';
+    this.statPoemsCount.textContent = '-';
     showToast('تمت استعادة الإعدادات الافتراضية', 'info');
-    this.checkApiStatusQuietly();
+    this.startApp();
   }
 
   async testConnection() {
@@ -1523,11 +1287,11 @@ class DiwanApp {
       this.pingStatusBox.className = 'p-3 rounded-xl text-xs font-medium bg-emerald-950/60 text-emerald-300 border border-emerald-800';
       this.pingStatusBox.textContent = `✓ ${res.message}`;
       this.updateApiStatusIndicator('online');
-      await this.api.updatePoemCount('statPoemsCount');
+      this.fetchPoemCountQuietly();
     } else {
-      this.pingStatusBox.className = 'p-3 rounded-xl text-xs font-medium bg-amber-950/60 text-amber-300 border border-amber-800';
-      this.pingStatusBox.textContent = `ℹ ${res.message}`;
-      this.updateApiStatusIndicator('demo');
+      this.pingStatusBox.className = 'p-3 rounded-xl text-xs font-medium bg-rose-950/60 text-rose-300 border border-rose-800';
+      this.pingStatusBox.textContent = `✕ ${res.message}`;
+      this.updateApiStatusIndicator('offline');
     }
 
     if (window.lucide) lucide.createIcons();
@@ -1537,9 +1301,16 @@ class DiwanApp {
     const res = await this.api.ping();
     if (res.success) {
       this.updateApiStatusIndicator('online');
-      await this.api.updatePoemCount('statPoemsCount');
+      this.fetchPoemCountQuietly();
     } else {
-      this.updateApiStatusIndicator('demo');
+      this.updateApiStatusIndicator('offline');
+    }
+  }
+
+  async fetchPoemCountQuietly() {
+    const count = await this.api.getPoemsCount();
+    if (count !== null && count !== undefined) {
+      this.statPoemsCount.textContent = `+${Number(count).toLocaleString('en-US')}`;
     }
   }
 
@@ -1549,9 +1320,9 @@ class DiwanApp {
       this.apiStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
       this.apiStatusText.textContent = 'API متصل';
     } else {
-      this.apiStatusBadge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold bg-amber-950/40 text-amber-400 border-amber-800/50 hover:bg-amber-900/40 transition-colors';
-      this.apiStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
-      this.apiStatusText.textContent = 'البيانات المدمجة (Demo)';
+      this.apiStatusBadge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold bg-rose-950/40 text-rose-400 border-rose-800/50 hover:bg-rose-900/40 transition-colors';
+      this.apiStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
+      this.apiStatusText.textContent = 'API غير متصل';
     }
   }
 }

@@ -81,9 +81,9 @@
       <!-- Right Controls: API Status & Settings -->
       <div class="flex items-center gap-3">
         <!-- API Status Indicator -->
-        <button id="apiStatusBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold bg-emerald-950/40 text-emerald-400 border-emerald-800/50 hover:bg-emerald-900/40 transition-colors" title="انقر لتعديل إعدادات الربط مع API">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" id="apiStatusDot"></span>
-          <span id="apiStatusText" class="hidden md:inline">API متصل</span>
+        <button id="apiStatusBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-700/60 transition-colors" title="انقر لتعديل إعدادات الربط مع API">
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-400 animate-pulse" id="apiStatusDot"></span>
+          <span id="apiStatusText" class="hidden md:inline">جاري الفحص...</span>
         </button>
 
         <!-- Settings Button -->
@@ -113,17 +113,17 @@
       <!-- Stats Bar -->
       <div class="mt-8 flex flex-wrap justify-center items-center gap-6 sm:gap-12 text-center">
         <div>
-          <div class="text-2xl font-bold font-kufi text-[#dfc185]" id="statErasCount">10+</div>
+          <div class="text-2xl font-bold font-kufi text-[#dfc185]" id="statErasCount">-</div>
           <div class="text-xs text-slate-400">عصور أدبية</div>
         </div>
         <div class="w-px h-8 bg-[#2a374a]"></div>
         <div>
-          <div class="text-2xl font-bold font-kufi text-[#dfc185]" id="statPoetsCount">+2,800</div>
+          <div class="text-2xl font-bold font-kufi text-[#dfc185]" id="statPoetsCount">-</div>
           <div class="text-xs text-slate-400">شاعر عربي</div>
         </div>
         <div class="w-px h-8 bg-[#2a374a]"></div>
         <div>
-          <div class="text-2xl font-bold font-kufi text-[#dfc185]" id="statPoemsCount">+160,000</div>
+          <div class="text-2xl font-bold font-kufi text-[#dfc185]" id="statPoemsCount">-</div>
           <div class="text-xs text-slate-400">قصيدة ومقتطف</div>
         </div>
       </div>
@@ -209,14 +209,14 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div>
             <div class="flex items-center gap-2 mb-2 flex-wrap">
-              <span id="poemEraBadge" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#c5a059]/15 text-[#dfc185] border border-[#c5a059]/30">العصر الأموي</span>
-              <span id="poemMeterBadge" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">بحر الطويل</span>
-              <span id="poemVersesCountBadge" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">12 بيتاً</span>
+              <span id="poemEraBadge" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#c5a059]/15 text-[#dfc185] border border-[#c5a059]/30">-</span>
+              <span id="poemMeterBadge" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">-</span>
+              <span id="poemVersesCountBadge" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">-</span>
             </div>
-            <h2 id="poemTitle" class="text-2xl sm:text-4xl font-extrabold font-kufi text-white mb-2 leading-tight">عنوان القصيدة</h2>
+            <h2 id="poemTitle" class="text-2xl sm:text-4xl font-extrabold font-kufi text-white mb-2 leading-tight"></h2>
             <div class="flex items-center gap-2 text-sm text-slate-300">
               <i data-lucide="user" class="w-4 h-4 text-[#c5a059]"></i>
-              <span id="poemPoetName" class="font-medium text-slate-200">اسم الشاعر</span>
+              <span id="poemPoetName" class="font-medium text-slate-200"></span>
             </div>
           </div>
 
@@ -327,7 +327,7 @@
       <div class="space-y-4 text-sm">
         <div>
           <label class="block text-slate-300 font-medium mb-1.5">رابط الخادم (API Base URL):</label>
-          <input type="text" id="apiBaseUrlInput" placeholder="https://api.aldiwan.net/v1" 
+          <input type="text" id="apiBaseUrlInput" placeholder="https://api.aldiwan.net/api/v1" 
                  class="w-full bg-[#121924] border border-[#2a374a] rounded-xl px-4 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-[#c5a059]">
           <p class="text-[11px] text-slate-400 mt-1">عنوان خادم منصة الديوان أو البروكسي المحلي.</p>
         </div>
@@ -343,7 +343,7 @@
           <i data-lucide="shield-check" class="w-5 h-5 text-[#c5a059] flex-shrink-0 mt-0.5"></i>
           <div>
             <strong>تخزين آمن ومحلي:</strong>
-            يتم حفظ الإعدادات على متصفحك (localStorage) مباشرة ولا يتم إرسالها لأي طرف ثالث. في حال عدم توفر الخادم، سيعمل التطبيق تلقائياً بالبيانات المدمجة عالية الجودة (Demo Mode).
+            يتم حفظ الإعدادات على متصفحك (localStorage) مباشرة ولا يتم إرسالها لأي طرف ثالث. يتصل التطبيق مباشرة بالخادم المخصص لجلب البيانات الحية دون أي بيانات مدمجة.
           </div>
         </div>
 
