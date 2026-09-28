@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>روائع الديوان | Diwan Showcase Web App</title>
+  <meta name="description" content="منصة تفاعلية لاستعراض الشعر العربي وروائعه وربطه بـ API مطوري الديوان مع إمكانية القراءة وتصدير الاقتباسات">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📜</text></svg>">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              gold: '#c5a059',
+              goldLight: '#dfc185',
+              goldDark: '#9b7a37',
+              dark: '#0f141c',
+              card: '#18202c',
+              border: '#2a374a',
+            }
+          },
+          fontFamily: {
+            amiri: ['Amiri', 'serif'],
+            cairo: ['Cairo', 'sans-serif'],
+            kufi: ['Reem Kufi', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[#0f141c] text-slate-100 min-h-screen flex flex-col font-cairo selection:bg-[#c5a059] selection:text-black">
+
+  <!-- Top Navbar -->
+  <header class="sticky top-0 z-40 bg-[#121924]/90 backdrop-blur-md border-b border-[#2a374a] transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="#" id="brandLogoBtn" class="flex items-center gap-3 group text-decoration-none">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#c5a059] to-[#9b7a37] flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-[#c5a059]/20 group-hover:scale-105 transition-transform">
+          <i data-lucide="feather" class="w-6 h-6 stroke-[2.2]"></i>
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold font-kufi tracking-wide text-white group-hover:text-[#dfc185] transition-colors">
+            رَوَائِعُ الدِّيوَان
+          </h1>
+          <p class="text-xs text-slate-400 font-medium hidden sm:block">بوابة الشعر العربي الأصيل و API الديوان</p>
+        </div>
+      </a>
+
+      <!-- Search Bar -->
+      <div class="flex-1 max-w-md mx-2 relative">
+        <div class="relative">
+          <i data-lucide="search" class="w-5 h-5 absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input type="text" id="globalSearchInput" placeholder="ابحث عن شاعر، قصيدة، أو بيت شعري..." 
+                 class="w-full bg-[#18202c] border border-[#2a374a] rounded-xl pr-11 pl-4 py-2 text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:border-[#c5a059] focus:ring-1 focus:ring-[#c5a059] transition-all">
+          <button id="clearSearchBtn" class="hidden absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+        
+        <!-- Live Search Dropdown -->
+        <div id="searchDropdown" class="hidden absolute top-full mt-2 w-full bg-[#18202c] border border-[#2a374a] rounded-xl shadow-2xl overflow-hidden z-50 max-h-96 overflow-y-auto">
+          <div id="searchResultsList" class="divide-y divide-[#2a374a]/60"></div>
+        </div>
+      </div>
+
+      <!-- Right Controls: API Status & Settings -->
+      <div class="flex items-center gap-3">
+        <!-- API Status Indicator -->
+        <button id="apiStatusBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold bg-emerald-950/40 text-emerald-400 border-emerald-800/50 hover:bg-emerald-900/40 transition-colors" title="انقر لتعديل إعدادات الربط مع API">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" id="apiStatusDot"></span>
+          <span id="apiStatusText" class="hidden md:inline">API متصل</span>
+        </button>
+
+        <!-- Settings Button -->
+        <button id="openSettingsBtn" class="p-2.5 rounded-xl border border-[#2a374a] bg-[#18202c] hover:bg-[#1f2a3a] text-slate-300 hover:text-[#dfc185] transition-colors" title="إعدادات الـ API">
+          <i data-lucide="settings" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="heroSection" class="relative overflow-hidden py-12 md:py-16 border-b border-[#2a374a] bg-gradient-to-b from-[#121924] to-[#0f141c]">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.06)_0%,transparent_70%)] pointer-events-none"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#c5a059]/10 text-[#dfc185] border border-[#c5a059]/25 text-xs font-semibold mb-4">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+        عصارة تراث الفصحى وأعلام البيان
+      </span>
+      <h2 class="text-3xl sm:text-5xl font-black font-kufi tracking-tight mb-4 gold-gradient-text leading-tight">
+        «وَمَا مِنْ كَاتِبٍ إِلَّا سَيَفْنَى.. وَيُبْقِي الدَّهْرُ مَا كَتَبَتْ يَدَاهُ»
+      </h2>
+      <p class="max-w-2xl mx-auto text-slate-300 text-sm sm:text-base leading-relaxed font-light">
+        تطبيق استعراضي متكامل يعتمد على منصة مطوري <strong class="text-[#c5a059] font-medium">الديوان</strong>. تصفح أروع القصائد مع تنسيق الشطرين المتقابلين، خيارات التحكم بالتشكيل، وبطاقات الاقتباسات القابلة للتنزيل.
+      </p>
+
+      <!-- Stats Bar -->
+      <div class="mt-8 flex flex-wrap justify-center items-center gap-6 sm:gap-12 text-center">
+        <div>
+          <div class="text-2xl font-bold font-kufi text-[#dfc185]" id="statErasCount">6</div>
+          <div class="text-xs text-slate-400">عصور أدبية</div>
+        </div>
+        <div class="w-px h-8 bg-[#2a374a]"></div>
+        <div>
+          <div class="text-2xl font-bold font-kufi text-[#dfc185]" id="statPoetsCount">24+</div>
+          <div class="text-xs text-slate-400">من كبار الشعراء</div>
+        </div>
+        <div class="w-px h-8 bg-[#2a374a]"></div>
+        <div>
+          <div class="text-2xl font-bold font-kufi text-[#dfc185]" id="statPoemsCount">100+</div>
+          <div class="text-xs text-slate-400">قصيدة ومقتطف</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Breadcrumb -->
+    <nav id="breadcrumbNav" class="flex items-center gap-2 text-sm text-slate-400 mb-6 flex-wrap">
+      <button id="crumbHome" class="hover:text-[#dfc185] flex items-center gap-1">
+        <i data-lucide="home" class="w-4 h-4"></i>
+        <span>الرئيسية</span>
+      </button>
+      <span class="text-slate-600">/</span>
+      <span id="crumbEra" class="text-slate-300 cursor-pointer hover:text-[#dfc185]">العصور الأدبية</span>
+      <span id="crumbPoetSep" class="text-slate-600 hidden">/</span>
+      <span id="crumbPoet" class="text-slate-300 cursor-pointer hover:text-[#dfc185] hidden">الشاعر</span>
+      <span id="crumbPoemSep" class="text-slate-600 hidden">/</span>
+      <span id="crumbPoem" class="text-[#dfc185] font-semibold hidden">القصيدة</span>
+    </nav>
+
+    <!-- SECTION 1: Eras & Catalog View -->
+    <section id="catalogView" class="space-y-8">
+      
+      <!-- Era Filters (Tabs) -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-white font-kufi flex items-center gap-2">
+            <i data-lucide="landmark" class="w-5 h-5 text-[#c5a059]"></i>
+            العصور الأدبية
+          </h3>
+          <span class="text-xs text-slate-400">اختر عصراً لتصفية الشعراء</span>
+        </div>
+        <div class="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none" id="erasTabsContainer">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Poets Grid -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-white font-kufi flex items-center gap-2">
+            <i data-lucide="users" class="w-5 h-5 text-[#c5a059]"></i>
+            <span id="poetsSectionTitle">شعراء العصر</span>
+          </h3>
+          <span class="text-xs text-slate-400" id="poetsCountLabel">...</span>
+        </div>
+        <div id="poetsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Poems List for Selected Poet (shown dynamically) -->
+      <div id="poetPoemsSection" class="hidden pt-6 border-t border-[#2a374a]">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-2xl font-bold text-white font-kufi flex items-center gap-2">
+              <i data-lucide="book-open" class="w-6 h-6 text-[#c5a059]"></i>
+              <span id="selectedPoetNameTitle">قصائد الشاعر</span>
+            </h3>
+            <p id="selectedPoetBio" class="text-xs text-slate-400 mt-1 max-w-2xl"></p>
+          </div>
+          <button id="closePoetPoemsBtn" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#2a374a] bg-[#18202c]">
+            <i data-lucide="x" class="w-4 h-4"></i> إغلاق
+          </button>
+        </div>
+        <div id="poetPoemsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- SECTION 2: Poem Reader View -->
+    <section id="poemReaderView" class="hidden space-y-6">
+      
+      <!-- Poem Header Banner -->
+      <div class="bg-gradient-to-br from-[#18202c] to-[#121924] border border-[#2a374a] rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-xl">
+        <div class="absolute -left-12 -top-12 w-48 h-48 bg-[#c5a059]/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          <div>
+            <div class="flex items-center gap-2 mb-2 flex-wrap">
+              <span id="poemEraBadge" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#c5a059]/15 text-[#dfc185] border border-[#c5a059]/30">العصر الأموي</span>
+              <span id="poemMeterBadge" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">بحر الطويل</span>
+              <span id="poemVersesCountBadge" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">12 بيتاً</span>
+            </div>
+            <h2 id="poemTitle" class="text-2xl sm:text-4xl font-extrabold font-kufi text-white mb-2 leading-tight">عنوان القصيدة</h2>
+            <div class="flex items-center gap-2 text-sm text-slate-300">
+              <i data-lucide="user" class="w-4 h-4 text-[#c5a059]"></i>
+              <span id="poemPoetName" class="font-medium text-slate-200">اسم الشاعر</span>
+            </div>
+          </div>
+
+          <!-- Reader Action Controls Toolbar -->
+          <div class="flex items-center flex-wrap gap-2.5 bg-[#0f141c]/80 p-2 rounded-xl border border-[#2a374a]">
+            <!-- Font Size Controls -->
+            <div class="flex items-center bg-[#18202c] rounded-lg border border-[#2a374a] px-1">
+              <button id="decreaseFontBtn" class="p-2 text-slate-400 hover:text-white transition-colors" title="تصغير الخط">
+                <i data-lucide="minus" class="w-4 h-4"></i>
+              </button>
+              <span id="fontSizeDisplay" class="text-xs font-bold px-2 text-[#dfc185] select-none">100%</span>
+              <button id="increaseFontBtn" class="p-2 text-slate-400 hover:text-white transition-colors" title="تكبير الخط">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- Diacritics Toggle (التشكيل) -->
+            <button id="toggleDiacriticsBtn" class="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#c5a059]/40 bg-[#c5a059]/15 text-[#dfc185] text-xs font-bold hover:bg-[#c5a059]/25 transition-all" title="إظهار أو إخفاء حركات التشكيل">
+              <i data-lucide="type" class="w-4 h-4"></i>
+              <span id="diacriticsStatusLabel">التشكيل: مفعل</span>
+            </button>
+
+            <!-- Copy Full Poem -->
+            <button id="copyFullPoemBtn" class="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#2a374a] bg-[#18202c] text-slate-300 text-xs font-medium hover:text-white hover:bg-[#1f2a3a] transition-all" title="نسخ كامل نص القصيدة">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">نسخ القصيدة</span>
+            </button>
+
+            <!-- Back to Catalog -->
+            <button id="backToCatalogBtn" class="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#2a374a] bg-[#18202c] text-slate-300 text-xs font-medium hover:text-white hover:bg-[#1f2a3a] transition-all">
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              <span>العودة</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verses Container (Two-column poetic layout) -->
+      <div id="versesListContainer" class="space-y-3">
+        <!-- Rendered by JS as .verse-row -->
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Quote Card Creator Modal -->
+  <div id="quoteModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-[#18202c] border border-[#2a374a] rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative">
+      
+      <div class="flex items-center justify-between border-b border-[#2a374a] pb-4">
+        <h3 class="text-xl font-bold font-kufi text-white flex items-center gap-2">
+          <i data-lucide="quote" class="w-5 h-5 text-[#c5a059]"></i>
+          بطاقة اقتباس بيت شعري
+        </h3>
+        <button id="closeQuoteModalBtn" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Preview Box (#quoteCardPreview) -->
+      <div class="py-2">
+        <div id="quoteCardPreview" class="text-center space-y-6">
+          <div class="text-[#c5a059] flex justify-center">
+            <i data-lucide="sparkles" class="w-8 h-8 opacity-75"></i>
+          </div>
+          <div class="space-y-4">
+            <p id="quoteCardSadr" class="font-amiri text-2xl md:text-3xl text-slate-100 font-bold leading-relaxed"></p>
+            <div class="text-[#c5a059] opacity-60 text-lg">✦ ✦ ✦</div>
+            <p id="quoteCardAjuz" class="font-amiri text-2xl md:text-3xl text-[#dfc185] font-bold leading-relaxed"></p>
+          </div>
+          <div class="pt-4 border-t border-[#c5a059]/20 flex items-center justify-between text-xs text-slate-400">
+            <span id="quoteCardPoet" class="font-bold text-slate-200"></span>
+            <span class="text-[#c5a059] font-kufi">روائع الديوان</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button id="copyQuoteTextBtn" class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#2a374a] bg-[#121924] hover:bg-[#1f2a3a] text-slate-200 text-sm font-semibold transition-colors">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+          نسخ كنص
+        </button>
+        <button id="downloadQuoteImgBtn" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#c5a059] to-[#9b7a37] text-slate-950 text-sm font-bold shadow-lg shadow-[#c5a059]/20 hover:brightness-110 transition-all">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          تحميل كصورة (PNG)
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- API Settings Modal -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-[#18202c] border border-[#2a374a] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
+      
+      <div class="flex items-center justify-between border-b border-[#2a374a] pb-4">
+        <h3 class="text-xl font-bold font-kufi text-white flex items-center gap-2">
+          <i data-lucide="database" class="w-5 h-5 text-[#c5a059]"></i>
+          إعدادات اتصال API الديوان
+        </h3>
+        <button id="closeSettingsModalBtn" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-sm">
+        <div>
+          <label class="block text-slate-300 font-medium mb-1.5">رابط الخادم (API Base URL):</label>
+          <input type="text" id="apiBaseUrlInput" placeholder="https://api.aldiwan.net/v1" 
+                 class="w-full bg-[#121924] border border-[#2a374a] rounded-xl px-4 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-[#c5a059]">
+          <p class="text-[11px] text-slate-400 mt-1">عنوان خادم منصة الديوان أو البروكسي المحلي.</p>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-medium mb-1.5">رمز المصادقة (Bearer Token):</label>
+          <input type="password" id="apiTokenInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." 
+                 class="w-full bg-[#121924] border border-[#2a374a] rounded-xl px-4 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-[#c5a059]">
+          <p class="text-[11px] text-slate-400 mt-1">مفتاح API الخاص بك من لوحة تحكم مطوري الديوان (اختياري).</p>
+        </div>
+
+        <div class="bg-[#121924] border border-[#2a374a] rounded-xl p-3 text-xs text-slate-300 flex items-start gap-2.5">
+          <i data-lucide="shield-check" class="w-5 h-5 text-[#c5a059] flex-shrink-0 mt-0.5"></i>
+          <div>
+            <strong>تخزين آمن ومحلي:</strong>
+            يتم حفظ الإعدادات على متصفحك (localStorage) مباشرة ولا يتم إرسالها لأي طرف ثالث. في حال عدم توفر الخادم، سيعمل التطبيق تلقائياً بالبيانات المدمجة عالية الجودة (Demo Mode).
+          </div>
+        </div>
+
+        <div id="pingStatusBox" class="hidden p-3 rounded-xl text-xs font-medium"></div>
+      </div>
+
+      <div class="flex items-center justify-between gap-3 pt-3 border-t border-[#2a374a]">
+        <button id="testApiPingBtn" class="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#2a374a] bg-[#121924] hover:bg-[#1f2a3a] text-xs font-semibold text-slate-200 transition-colors">
+          <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
+          فحص الاتصال (Ping)
+        </button>
+        <div class="flex items-center gap-2">
+          <button id="resetApiSettingsBtn" class="px-3 py-2 rounded-xl text-xs text-rose-400 hover:bg-rose-950/30 transition-colors">
+            استعادة الافتراضي
+          </button>
+          <button id="saveApiSettingsBtn" class="px-5 py-2 rounded-xl bg-[#c5a059] hover:bg-[#dfc185] text-slate-950 text-xs font-bold transition-all shadow-md">
+            حفظ الإعدادات
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-6 left-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-[#2a374a] bg-[#121924] py-8 text-center text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <i data-lucide="feather" class="w-4 h-4 text-[#c5a059]"></i>
+        <span>تطبيق روائع الديوان © 2026 — تكريم الأدب العربي والفنون الرقمية</span>
+      </div>
+      <div class="flex items-center gap-4 text-slate-400">
+        <a href="https://aldiwan.net" target="_blank" class="hover:text-[#dfc185] transition-colors">موقع الديوان</a>
+        <span>•</span>
+        <a href="https://github.com/aldiwannet/aldiwan-web" target="_blank" class="hover:text-[#dfc185] transition-colors">مستودع المشروع</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Canvas for image generation (Offscreen) -->
+  <canvas id="quoteCanvas" class="hidden"></canvas>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+</body>
+</html>
