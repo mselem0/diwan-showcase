@@ -14,7 +14,23 @@ class ApiClient {
     this.storageKey = 'diwan_api_config';
     this.config = this.loadConfig();
     this.isOnlineApi = false;
+    // In-memory cache: { [cacheKey]: { data, expiresAt } }
+    this._cache = {};
+    this._cacheTTL = 120_000; // 2 minutes default
   }
+
+  _getCached(key) {
+    const entry = this._cache[key];
+    if (entry && Date.now() < entry.expiresAt) return entry.data;
+    delete this._cache[key];
+    return null;
+  }
+
+  _setCache(key, data, ttl = this._cacheTTL) {
+    this._cache[key] = { data, expiresAt: Date.now() + ttl };
+  }
+
+  clearCache() { this._cache = {}; }
 
   loadConfig() {
     const saved = localStorage.getItem(this.storageKey);
@@ -84,6 +100,14 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
+        if (response.status === 429) {
+          let retryAfter = 10;
+          try {
+            const body = await response.json();
+            retryAfter = body?.error?.retry_after ?? 10;
+          } catch (_) {}
+          throw new Error(`تجاوزت الحد المسموح من الطلبات (Rate Limit). انتظر ${retryAfter} ثوانٍ ثم أعد المحاولة.`);
+        }
         if (response.status === 403) {
           throw new Error('تم رفض الوصول (403 Forbidden). قد يتطلب الخادم رمز مصادقة (Bearer Token) في الإعدادات.');
         }
@@ -153,38 +177,58 @@ class ApiClient {
   }
 
   async getEras() {
+    const cached = this._getCached('eras');
+    if (cached) return cached;
     const data = await this.request('/eras');
-    return Array.isArray(data) ? data : (data?.eras || []);
+    const result = Array.isArray(data) ? data : (data?.eras || []);
+    this._setCache('eras', result, 300_000); // 5 min
+    return result;
   }
 
   async getPoets(eraId = 'all') {
-    const endpoint = (eraId && eraId !== 'all') 
-      ? `/poets?era=${encodeURIComponent(eraId)}` 
+    const cacheKey = `poets:${eraId}`;
+    const cached = this._getCached(cacheKey);
+    if (cached) return cached;
+    const endpoint = (eraId && eraId !== 'all')
+      ? `/poets?era=${encodeURIComponent(eraId)}`
       : '/poets';
     const data = await this.request(endpoint);
-    return Array.isArray(data) ? data : (data?.poets || data?.items || []);
+    const result = Array.isArray(data) ? data : (data?.poets || data?.items || []);
+    this._setCache(cacheKey, result, 120_000); // 2 min
+    return result;
   }
 
   async getPoetPoems(poetId) {
+    const cacheKey = `poet_poems:${poetId}`;
+    const cached = this._getCached(cacheKey);
+    if (cached) return cached;
     const data = await this.request(`/poets/${encodeURIComponent(poetId)}/poems`);
-    return Array.isArray(data) ? data : (data?.poems || data?.items || []);
+    const result = Array.isArray(data) ? data : (data?.poems || data?.items || []);
+    this._setCache(cacheKey, result, 120_000);
+    return result;
   }
 
   async getPoem(poemId) {
+    const cacheKey = `poem:${poemId}`;
+    const cached = this._getCached(cacheKey);
+    if (cached) return cached;
     const data = await this.request(`/poems/${encodeURIComponent(poemId)}`);
-    return data?.poem || data;
+    const result = data?.poem || data;
+    this._setCache(cacheKey, result, 300_000); // 5 min — poems don't change
+    return result;
   }
 
   async getPoemsCount() {
+    const cached = this._getCached('poems_count');
+    if (cached !== null && cached !== undefined) return cached;
     try {
       const data = await this.request('/poems/count', { timeout: 4000 });
       const count = data?.count ?? (typeof data === 'number' ? data : null);
-      if (count !== null && count !== undefined && !isNaN(count)) {
+      if (count !== null && !isNaN(count)) {
+        this._setCache('poems_count', Number(count), 600_000); // 10 min
         return Number(count);
       }
-    } catch (e) {
-      // Non-fatal if count endpoint doesn't exist
-    }
+    } catch (e) { /* Non-fatal */ }
     return null;
   }
 
@@ -489,9 +533,17 @@ class DiwanApp {
   }
 
   async startApp() {
-    await this.loadEras();
+    // loadEras itself proves connectivity — no separate ping needed
+    const erasOk = await this.loadEras();
     await this.loadPoets(this.currentEraId);
-    this.checkApiStatusQuietly();
+    // If eras loaded successfully, mark API online and fetch count
+    if (erasOk) {
+      this.updateApiStatusIndicator('online');
+      this.fetchPoemCountQuietly();
+    } else {
+      // Only ping separately if eras failed (to distinguish offline vs CORS)
+      this.checkApiStatusQuietly();
+    }
   }
 
   resetToHome() {
@@ -658,17 +710,19 @@ class DiwanApp {
 
       if (this.eras.length === 0) {
         this.erasTabsContainer.innerHTML = `
-          <div class="text-xs text-slate-400 py-2">لا توجد عصور متوفرة على الخادم حالياً.</div>
+          <div style="font-size:0.75rem;color:var(--ink-light);padding:0.5rem 0">لا توجد عصور متوفرة على الخادم حالياً.</div>
         `;
-        return;
+        return false;
       }
 
       this.statErasCount.textContent = `${this.eras.length}`;
       this.renderErasTabs();
+      return true;
     } catch (err) {
       console.error('Error fetching eras:', err);
       this.statErasCount.textContent = '-';
       this.renderErrorCard(this.erasTabsContainer, err.message, () => this.loadEras());
+      return false;
     }
   }
 
