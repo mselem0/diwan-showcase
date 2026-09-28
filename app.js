@@ -545,7 +545,6 @@ class DiwanApp {
     this.openSettingsBtn.addEventListener('click', () => this.openSettings());
     this.closeSettingsModalBtn.addEventListener('click', () => this.closeSettings());
     this.saveApiSettingsBtn.addEventListener('click', () => this.saveSettings());
-    this.resetApiSettingsBtn.addEventListener('click', () => this.resetSettings());
     this.testApiPingBtn.addEventListener('click', () => this.testConnection());
 
     // Quote modal events
