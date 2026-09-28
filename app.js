@@ -256,20 +256,16 @@ function showToast(message, type = 'info') {
   if (!container) return;
 
   const toast = document.createElement('div');
-  const bgClass = type === 'success' 
-    ? 'bg-emerald-950/90 text-emerald-200 border-emerald-800' 
-    : type === 'error'
-    ? 'bg-rose-950/90 text-rose-200 border-rose-800'
-    : 'bg-[#18202c]/95 text-slate-200 border-[#2a374a]';
+  const typeClass = type === 'success' ? 'toast-success' : type === 'error' ? 'toast-error' : 'toast-info';
+  toast.className = `toast ${typeClass}`;
+  toast.style.transform = 'translateY(8px)';
+  toast.style.opacity = '0';
+  toast.style.transition = 'all 0.25s cubic-bezier(0.4,0,0.2,1)';
+  toast.style.pointerEvents = 'auto';
 
-  toast.className = `px-4 py-3 rounded-xl border text-sm font-medium shadow-2xl flex items-center gap-2.5 backdrop-blur-md transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto ${bgClass}`;
-  
-  let iconName = 'info';
-  if (type === 'success') iconName = 'check-circle';
-  if (type === 'error') iconName = 'alert-triangle';
-
+  const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'alert-triangle' : 'info';
   toast.innerHTML = `
-    <i data-lucide="${iconName}" class="w-4 h-4 flex-shrink-0"></i>
+    <i data-lucide="${icon}" style="width:15px;height:15px;flex-shrink:0"></i>
     <span>${escapeHtml(message)}</span>
   `;
 
@@ -277,14 +273,17 @@ function showToast(message, type = 'info') {
   if (window.lucide) lucide.createIcons();
 
   requestAnimationFrame(() => {
-    toast.classList.remove('translate-y-4', 'opacity-0');
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
   });
 
   setTimeout(() => {
-    toast.classList.add('opacity-0', 'translate-y-2');
-    setTimeout(() => toast.remove(), 300);
+    toast.style.transform = 'translateY(4px)';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 250);
   }, 3500);
 }
+
 
 // ==========================================
 // 3. Main Application Controller (100% Dynamic)
@@ -553,10 +552,11 @@ class DiwanApp {
   // ==========================================
 
   renderErasSkeleton() {
-    this.erasTabsContainer.innerHTML = Array(6).fill(0).map(() => `
-      <div class="h-9 w-28 rounded-xl bg-[#18202c] border border-[#2a374a] animate-pulse flex-shrink-0"></div>
-    `).join('');
+    this.erasTabsContainer.innerHTML = Array(6).fill(0).map(() =>
+      `<div class="skeleton" style="height:34px;width:90px;border-radius:100px;flex-shrink:0;display:inline-block"></div>`
+    ).join('');
   }
+
 
   renderPoetsSkeleton() {
     this.poetsGrid.innerHTML = Array(8).fill(0).map(() => `
@@ -679,11 +679,7 @@ class DiwanApp {
     // "All Eras" Tab
     const isAll = this.currentEraId === 'all';
     const allBtn = document.createElement('button');
-    allBtn.className = `px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 border ${
-      isAll
-        ? 'bg-[#c5a059] text-slate-950 border-[#c5a059] shadow-lg shadow-[#c5a059]/20 font-bold'
-        : 'bg-[#18202c] text-slate-300 border-[#2a374a] hover:border-[#c5a059]/50 hover:text-white'
-    }`;
+    allBtn.className = `era-tab${isAll ? ' active' : ''}`;
     allBtn.innerHTML = `<span>كافة العصور</span>`;
     allBtn.addEventListener('click', () => {
       this.currentEraId = 'all';
@@ -699,20 +695,13 @@ class DiwanApp {
       const eraId = String(era.id ?? era.slug);
       const isSelected = eraId === String(this.currentEraId);
       const btn = document.createElement('button');
-      btn.className = `px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 border ${
-        isSelected
-          ? 'bg-[#c5a059] text-slate-950 border-[#c5a059] shadow-lg shadow-[#c5a059]/20 font-bold'
-          : 'bg-[#18202c] text-slate-300 border-[#2a374a] hover:border-[#c5a059]/50 hover:text-white'
-      }`;
+      btn.className = `era-tab${isSelected ? ' active' : ''}`;
 
-      const countBadge = era.poets_count || era.count
-        ? `<span class="text-[10px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-slate-950/20 text-slate-950' : 'bg-[#121924] text-slate-400'}">${era.poets_count || era.count}</span>`
+      const countBadge = (era.poets_count || era.count)
+        ? `<span class="era-tab-count">${era.poets_count || era.count}</span>`
         : '';
 
-      btn.innerHTML = `
-        <span>${escapeHtml(era.name || era.title)}</span>
-        ${countBadge}
-      `;
+      btn.innerHTML = `<span>${escapeHtml(era.name || era.title)}</span>${countBadge}`;
 
       btn.addEventListener('click', () => {
         this.currentEraId = eraId;
@@ -725,6 +714,7 @@ class DiwanApp {
       this.erasTabsContainer.appendChild(btn);
     });
   }
+
 
   async loadPoets(eraId = 'all') {
     this.renderPoetsSkeleton();
@@ -1247,12 +1237,12 @@ class DiwanApp {
 
     this.pingStatusBox.classList.remove('hidden');
     if (res.success) {
-      this.pingStatusBox.className = 'p-3 rounded-xl text-xs font-medium bg-emerald-950/60 text-emerald-300 border border-emerald-800';
+      this.pingStatusBox.style.cssText = 'background:rgba(5,46,22,0.7);color:#86efac;border:1px solid rgba(74,222,128,0.2);border-radius:8px;padding:10px 14px;font-size:0.78rem;font-weight:500';
       this.pingStatusBox.textContent = `✓ ${res.message}`;
       this.updateApiStatusIndicator('online');
       this.fetchPoemCountQuietly();
     } else {
-      this.pingStatusBox.className = 'p-3 rounded-xl text-xs font-medium bg-rose-950/60 text-rose-300 border border-rose-800';
+      this.pingStatusBox.style.cssText = 'background:rgba(69,10,10,0.7);color:#fca5a5;border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:10px 14px;font-size:0.78rem;font-weight:500';
       this.pingStatusBox.textContent = `✕ ${res.message}`;
       this.updateApiStatusIndicator('offline');
     }
