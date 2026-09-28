@@ -28,13 +28,10 @@
       <button id="openSearchBtn" class="icon-btn" title="البحث الشامل">
         <i data-lucide="search" style="width:18px;height:18px"></i>
       </button>
-      <button id="apiStatusBadge" class="api-badge" title="حالة الخادم">
+      <div id="apiStatusBadge" class="api-badge" title="حالة الخادم">
         <span id="apiStatusDot" class="status-dot status-pending"></span>
         <span id="apiStatusText" style="white-space:nowrap">جاري...</span>
-      </button>
-      <button id="openSettingsBtn" class="icon-btn" title="الإعدادات">
-        <i data-lucide="settings" style="width:18px;height:18px"></i>
-      </button>
+      </div>
     </div>
   </div>
 </header>
@@ -96,7 +93,7 @@
 
     <div>
       <div class="section-head">
-        <h2 class="section-title">الشعراء <span id="poetsCountLabel" style="font-weight:400;color:var(--sage);font-size:1rem;margin-right:10px"></span></h2>
+        <h2 class="section-title"><span id="poetsSectionTitle">الشعراء</span> <span id="poetsCountLabel" style="font-weight:400;color:var(--sage);font-size:1rem;margin-right:10px"></span></h2>
       </div>
       <div id="poetsGrid" class="poet-grid"></div>
     </div>
@@ -191,31 +188,6 @@
   </div>
 </div>
 <canvas id="quoteCanvas" class="hidden"></canvas>
-
-<!-- SETTINGS MODAL -->
-<div id="settingsModal" class="modal-backdrop hidden">
-  <div class="modal-box" style="max-width:400px">
-    <div class="modal-head">
-      <h3 class="modal-title">الإعدادات</h3>
-      <button id="closeSettingsModalBtn" class="icon-btn" style="width:30px;height:30px"><i data-lucide="x" style="width:16px"></i></button>
-    </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:1.25rem">
-      <div>
-        <label style="font-size:0.8rem;font-weight:700;margin-bottom:6px;display:block">Base URL</label>
-        <input type="text" id="apiBaseUrlInput" class="app-input" dir="ltr">
-      </div>
-      <div>
-        <label style="font-size:0.8rem;font-weight:700;margin-bottom:6px;display:block">Bearer Token</label>
-        <input type="password" id="apiTokenInput" class="app-input" dir="ltr">
-      </div>
-      <div id="pingStatusBox" class="hidden" style="padding:10px;border-radius:6px;font-size:0.8rem;text-align:center"></div>
-      <div style="display:flex;gap:10px;margin-top:10px">
-        <button id="testApiPingBtn" class="tb-btn" style="flex:1;justify-content:center">فحص</button>
-        <button id="saveApiSettingsBtn" class="tb-btn active" style="flex:2;justify-content:center">حفظ</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div id="toastContainer" style="position:fixed;bottom:2rem;left:2rem;z-index:999;display:flex;flex-direction:column;gap:10px"></div>
 
