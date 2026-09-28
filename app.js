@@ -885,27 +885,49 @@ class DiwanApp {
       }
 
       this.currentPoem.title = fullPoem.title || fullPoem.name || this.currentPoem.title;
-      this.currentPoem.poetName = fullPoem.poet_name || fullPoem.poetName || poetName;
+      this.currentPoem.poetName = fullPoem.poet?.name || fullPoem.poet_name || fullPoem.poetName || poetName;
       this.currentPoem.meter = fullPoem.meter || fullPoem.bahr || this.currentPoem.meter;
-      this.currentPoem.eraName = fullPoem.era_name || fullPoem.eraName || eraName;
+      this.currentPoem.eraName = fullPoem.era?.name || fullPoem.era_name || fullPoem.eraName || eraName;
 
-      // Normalize verses array
-      const rawVerses = fullPoem.verses || fullPoem.lines || [];
+      // Normalize verses — API may return:
+      // 1. verses: [{sadr, ajuz}] array
+      // 2. verses: ["string"] array
+      // 3. text: "full poem as single string\nline2\nline3..."
+      let rawVerses = fullPoem.verses || fullPoem.lines || [];
+
+      // If no verses array but there's a text string, split it into lines
+      if ((!rawVerses || rawVerses.length === 0) && typeof fullPoem.text === 'string' && fullPoem.text.trim()) {
+        const lines = fullPoem.text
+          .split(/\n|\r\n|\r/)
+          .map(l => l.trim())
+          .filter(l => l.length > 0);
+
+        // Each two consecutive lines form one verse (sadr + ajuz)
+        rawVerses = [];
+        for (let i = 0; i < lines.length; i += 2) {
+          rawVerses.push({
+            sadr: lines[i] || '',
+            ajuz: lines[i + 1] || ''
+          });
+        }
+      }
+
       this.currentPoem.verses = rawVerses.map((v, idx) => {
         if (typeof v === 'string') {
-          const parts = v.split(/\s*[\.\*…]{2,}\s*|\t+/);
+          // Try splitting by common Arabic verse separator patterns
+          const parts = v.split(/\s{3,}|\t+|\.{2,}|…/);
           return {
             num: idx + 1,
-            sadr: parts[0] || v,
-            ajuz: parts[1] || ''
+            sadr: (parts[0] || v).trim(),
+            ajuz: (parts[1] || '').trim()
           };
         }
         return {
           num: v.num || v.index || (idx + 1),
-          sadr: v.sadr || v.first_hemistich || v.firstHemistich || '',
-          ajuz: v.ajuz || v.second_hemistich || v.secondHemistich || ''
+          sadr: (v.sadr || v.first_hemistich || v.firstHemistich || '').trim(),
+          ajuz: (v.ajuz || v.second_hemistich || v.secondHemistich || '').trim()
         };
-      });
+      }).filter(v => v.sadr || v.ajuz); // Remove empty verses
 
       this.poemTitle.textContent = this.currentPoem.title;
       this.poemPoetName.textContent = this.currentPoem.poetName;
@@ -924,10 +946,9 @@ class DiwanApp {
   applyFontSize() {
     const percentage = Math.round(this.fontSizeScale * 100);
     this.fontSizeDisplay.textContent = `${percentage}%`;
-
-    const verseTexts = document.querySelectorAll('.verse-text-container');
-    verseTexts.forEach(el => {
-      el.style.fontSize = `${1.35 * this.fontSizeScale}rem`;
+    // Update all verse text elements inline since they use inline style
+    document.querySelectorAll('.verse-sadr, .verse-ajuz').forEach(el => {
+      el.style.fontSize = `${1.3 * this.fontSizeScale}rem`;
     });
   }
 
