@@ -8,6 +8,11 @@
 // 1. Rich Mock Data & Fallback Knowledge Base
 // ==========================================
 const MOCK_DATA = {
+  stats: {
+    eras: '10+',
+    poets: '+2,800',
+    poems: '+160,000'
+  },
   eras: [
     { id: 'all', name: 'كافة العصور', slug: 'all', count: 24 },
     { id: 'jahili', name: 'العصر الجاهلي', slug: 'jahili', count: 5, desc: 'عصر الفصاحة وأصحاب المعلقات الخالدة' },
@@ -646,6 +651,36 @@ class ApiClient {
     return MOCK_DATA.poems.find(p => p.id === poemId);
   }
 
+  async getPoemsCount() {
+    try {
+      const res = await fetch(`${this.config.baseUrl}/poems/count`, { headers: this.getHeaders() });
+      if (res.ok) {
+        const json = await res.json();
+        const count = json?.data?.count ?? json?.count ?? (typeof json?.data === 'number' ? json.data : null);
+        if (count !== null && count !== undefined && !isNaN(count)) {
+          return Number(count);
+        }
+      }
+    } catch (e) {
+      console.warn('API error fetching poems count, fallback to default', e);
+    }
+    return null;
+  }
+
+  async updatePoemCount(elementId = 'statPoemsCount') {
+    const count = await this.getPoemsCount();
+    if (count !== null && count !== undefined) {
+      const el = document.getElementById(elementId);
+      if (el) {
+        const formatted = Number(count).toLocaleString('en-US');
+        el.textContent = `+${formatted}`;
+        el.title = `إجمالي القصائد الدقيق من خادم الديوان: ${formatted} قصيدة`;
+      }
+      return count;
+    }
+    return null;
+  }
+
   search(query) {
     if (!query || !query.trim()) return [];
     const q = query.trim().toLowerCase();
@@ -837,6 +872,11 @@ class DiwanApp {
     this.apiStatusDot = document.getElementById('apiStatusDot');
     this.apiStatusText = document.getElementById('apiStatusText');
     this.brandLogoBtn = document.getElementById('brandLogoBtn');
+
+    // Header Platform Stats
+    this.statErasCount = document.getElementById('statErasCount');
+    this.statPoetsCount = document.getElementById('statPoetsCount');
+    this.statPoemsCount = document.getElementById('statPoemsCount');
   }
 
   initEventListeners() {
@@ -1456,6 +1496,10 @@ class DiwanApp {
     this.api.resetConfig();
     this.apiBaseUrlInput.value = this.api.config.baseUrl;
     this.apiTokenInput.value = '';
+    if (this.statPoemsCount && MOCK_DATA.stats) {
+      this.statPoemsCount.textContent = MOCK_DATA.stats.poems;
+      this.statPoemsCount.removeAttribute('title');
+    }
     showToast('تمت استعادة الإعدادات الافتراضية', 'info');
     this.checkApiStatusQuietly();
   }
@@ -1479,6 +1523,7 @@ class DiwanApp {
       this.pingStatusBox.className = 'p-3 rounded-xl text-xs font-medium bg-emerald-950/60 text-emerald-300 border border-emerald-800';
       this.pingStatusBox.textContent = `✓ ${res.message}`;
       this.updateApiStatusIndicator('online');
+      await this.api.updatePoemCount('statPoemsCount');
     } else {
       this.pingStatusBox.className = 'p-3 rounded-xl text-xs font-medium bg-amber-950/60 text-amber-300 border border-amber-800';
       this.pingStatusBox.textContent = `ℹ ${res.message}`;
@@ -1492,6 +1537,7 @@ class DiwanApp {
     const res = await this.api.ping();
     if (res.success) {
       this.updateApiStatusIndicator('online');
+      await this.api.updatePoemCount('statPoemsCount');
     } else {
       this.updateApiStatusIndicator('demo');
     }
