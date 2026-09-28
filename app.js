@@ -762,49 +762,32 @@ class DiwanApp {
     }
 
     poets.forEach(poet => {
-      const card = document.createElement('div');
-      card.className = 'group p-5 rounded-2xl bg-[#18202c]/80 border border-[#2a374a] hover:border-[#c5a059]/60 hover:bg-[#1f2a3a] transition-all duration-300 flex flex-col justify-between cursor-pointer shadow-lg hover:shadow-2xl hover:-translate-y-1';
-      
       const eraName = poet.era_name || poet.eraName || poet.era?.name || (eraObj ? eraObj.name : '');
       const poemsCount = poet.poems_count || poet.poemsCount || '';
+
+      const card = document.createElement('div');
+      card.className = 'poet-card animate-in';
 
       card.innerHTML = `
         <div>
           <div class="flex items-start justify-between gap-3 mb-3">
-            <div class="w-12 h-12 rounded-xl bg-[#121924] border border-[#2a374a] flex items-center justify-center text-2xl group-hover:scale-110 group-hover:border-[#c5a059]/40 transition-all">
-              ${poet.avatar || '📜'}
-            </div>
-            ${eraName ? `
-              <span class="text-[11px] px-2 py-0.5 rounded-full bg-[#c5a059]/15 text-[#dfc185] border border-[#c5a059]/25 font-medium">
-                ${escapeHtml(eraName)}
-              </span>
-            ` : ''}
+            <div class="poet-avatar">${poet.avatar || '📜'}</div>
+            ${eraName ? `<span class="poet-era-badge">${escapeHtml(eraName)}</span>` : ''}
           </div>
-          <h4 class="text-base font-bold font-kufi text-white group-hover:text-[#dfc185] transition-colors mb-1">
-            ${escapeHtml(poet.name || poet.title)}
-          </h4>
-          ${poet.title && poet.title !== poet.name ? `
-            <p class="text-xs text-[#c5a059] font-medium mb-2">${escapeHtml(poet.title)}</p>
-          ` : ''}
-          <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed font-light">
-            ${escapeHtml(poet.bio || poet.description || 'شاعر عربي أصيل')}
-          </p>
+          <h4 class="poet-name">${escapeHtml(poet.name || poet.title)}</h4>
+          ${poet.title && poet.title !== poet.name
+            ? `<p class="text-xs font-medium mt-0.5" style="color:var(--gold)">${escapeHtml(poet.title)}</p>`
+            : ''}
+          <p class="poet-title line-clamp-2">${escapeHtml(poet.bio || poet.description || 'شاعر عربي أصيل')}</p>
         </div>
-        <div class="mt-4 pt-3 border-t border-[#2a374a]/60 flex items-center justify-between text-xs text-slate-400">
-          <span class="flex items-center gap-1">
-            <i data-lucide="book" class="w-3.5 h-3.5 text-[#c5a059]"></i>
-            ${poemsCount ? `${poemsCount} قصيدة` : 'استعراض القصائد'}
-          </span>
-          <span class="text-[#dfc185] flex items-center gap-1 font-semibold group-hover:translate-x-[-4px] transition-transform">
-            تصفح القصائد <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
-          </span>
+        <div class="poet-poems-count">
+          <i data-lucide="book-open" class="w-3 h-3" style="color:var(--gold)"></i>
+          <span>${poemsCount ? `${poemsCount} قصيدة` : 'استعراض القصائد'}</span>
+          <span class="mr-auto text-xs font-semibold" style="color:var(--gold-light)">تصفح ←</span>
         </div>
       `;
 
-      card.addEventListener('click', () => {
-        this.loadPoetPoems(poet);
-      });
-
+      card.addEventListener('click', () => this.loadPoetPoems(poet));
       this.poetsGrid.appendChild(card);
     });
 
@@ -844,45 +827,34 @@ class DiwanApp {
     }
 
     poems.forEach(poem => {
-      const meter = poem.meter || poem.bahr || 'بحر شعري';
+      const meter = poem.meter || poem.bahr || '';
       const versesCount = poem.verses_count || poem.versesCount || (Array.isArray(poem.verses) ? poem.verses.length : '');
       const firstVerseText = Array.isArray(poem.verses) && poem.verses[0]
         ? `${poem.verses[0].sadr || ''} ... ${poem.verses[0].ajuz || ''}`
         : (poem.snippet || poem.first_verse || '');
 
       const card = document.createElement('div');
-      card.className = 'group p-5 rounded-xl bg-[#18202c] border border-[#2a374a] hover:border-[#c5a059] transition-all cursor-pointer flex flex-col justify-between hover:bg-[#1f2a3a]';
+      card.className = 'poem-card animate-in';
       card.innerHTML = `
         <div>
-          <div class="flex items-center justify-between gap-2 mb-2">
-            <span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-mono">
-              ${escapeHtml(meter)}
-            </span>
-            ${versesCount ? `
-              <span class="text-xs text-slate-400">
-                ${versesCount} بيتاً
-              </span>
-            ` : ''}
+          <div class="flex items-center gap-2 mb-3 flex-wrap">
+            ${meter ? `<span class="poem-meta-tag">${escapeHtml(meter)}</span>` : ''}
+            ${versesCount ? `<span class="poem-meta-tag"><i data-lucide="align-left" class="w-3 h-3"></i> ${versesCount} بيتاً</span>` : ''}
           </div>
-          <h4 class="text-base font-bold font-kufi text-white group-hover:text-[#dfc185] transition-colors mb-2">
-            ${escapeHtml(poem.title || poem.name)}
-          </h4>
+          <h4 class="poem-card-title">${escapeHtml(poem.title || poem.name)}</h4>
           ${firstVerseText ? `
-            <p class="text-xs text-slate-400 font-amiri leading-relaxed line-clamp-2 italic">
+            <p class="text-xs mt-2 leading-relaxed line-clamp-2" style="font-family:'Amiri',serif;color:var(--text-muted);font-style:italic">
               «${escapeHtml(firstVerseText)}»
             </p>
           ` : ''}
         </div>
-        <div class="mt-4 pt-3 border-t border-[#2a374a]/60 flex items-center justify-between text-xs font-semibold text-[#c5a059]">
-          <span>فتح قارئ القصيدة</span>
-          <i data-lucide="arrow-left" class="w-4 h-4 group-hover:translate-x-[-4px] transition-transform"></i>
+        <div class="flex items-center justify-between mt-4 pt-3 text-xs font-semibold" style="border-top:1px solid var(--border-subtle);color:var(--gold)">
+          <span>قراءة القصيدة</span>
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
         </div>
       `;
 
-      card.addEventListener('click', () => {
-        this.openPoemReader(poem, poet);
-      });
-
+      card.addEventListener('click', () => this.openPoemReader(poem, poet));
       this.poetPoemsGrid.appendChild(card);
     });
 
@@ -975,49 +947,40 @@ class DiwanApp {
 
     if (this.currentPoem.verses.length === 0) {
       this.versesListContainer.innerHTML = `
-        <div class="py-12 text-center text-slate-400 border border-dashed border-[#2a374a] rounded-2xl text-xs">
-          لا توجد أبيات مسجلة لهذه القصيدة على الخادم.
+        <div class="empty-state">
+          <div class="empty-state-icon">📜</div>
+          <p class="text-sm">لا توجد أبيات مسجلة لهذه القصيدة على الخادم.</p>
         </div>
       `;
       return;
     }
 
-    this.currentPoem.verses.forEach(v => {
+    this.currentPoem.verses.forEach((v, idx) => {
       const sadrText = this.showDiacritics ? v.sadr : removeDiacritics(v.sadr);
       const ajuzText = this.showDiacritics ? v.ajuz : removeDiacritics(v.ajuz);
+      const num = v.num || (idx + 1);
 
       const row = document.createElement('div');
-      row.className = 'verse-row';
+      row.className = 'verse-row animate-in';
+      row.style.animationDelay = `${idx * 20}ms`;
 
       row.innerHTML = `
-        <div class="verse-num" title="بيت رقم ${v.num}">${v.num}</div>
-        <div class="verse-text-container" style="font-size: ${1.35 * this.fontSizeScale}rem">
-          <div class="verse-sadr">${escapeHtml(sadrText)}</div>
-          <div class="verse-separator">✦</div>
-          <div class="verse-ajuz">${escapeHtml(ajuzText)}</div>
-        </div>
-        <div class="verse-actions">
-          <button class="p-2 rounded-lg bg-[#121924] border border-[#2a374a] text-slate-300 hover:text-[#dfc185] hover:border-[#c5a059] transition-all quote-btn" title="تصدير كبطاقة اقتباس">
-            <i data-lucide="quote" class="w-4 h-4"></i>
-          </button>
-          <button class="p-2 rounded-lg bg-[#121924] border border-[#2a374a] text-slate-300 hover:text-white hover:border-slate-500 transition-all copy-verse-btn" title="نسخ هذا البيت">
-            <i data-lucide="copy" class="w-4 h-4"></i>
-          </button>
-        </div>
+        <span class="verse-num">${num}</span>
+        <span class="verse-sadr" style="font-size:${1.3 * this.fontSizeScale}rem">${escapeHtml(sadrText)}</span>
+        <span class="verse-separator">✦</span>
+        <span class="verse-ajuz" style="font-size:${1.3 * this.fontSizeScale}rem">${escapeHtml(ajuzText)}</span>
+        <button class="verse-quote-btn" title="بطاقة اقتباس">
+          <i data-lucide="quote" class="w-3 h-3"></i>
+        </button>
       `;
 
-      // Copy verse
-      const copyBtn = row.querySelector('.copy-verse-btn');
-      copyBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const text = `${sadrText} ... ${ajuzText}\n— ${this.currentPoem.poetName}`;
-        navigator.clipboard.writeText(text).then(() => {
-          showToast('تم نسخ البيت إلى الحافظة', 'success');
-        });
+      // Copy on row click (anywhere in the row)
+      row.addEventListener('click', () => {
+        this.openQuoteModal(v, sadrText, ajuzText);
       });
 
-      // Quote verse
-      const quoteBtn = row.querySelector('.quote-btn');
+      // Verse quote button
+      const quoteBtn = row.querySelector('.verse-quote-btn');
       quoteBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         this.openQuoteModal(v, sadrText, ajuzText);
@@ -1315,14 +1278,23 @@ class DiwanApp {
   }
 
   updateApiStatusIndicator(status) {
+    const dot = this.apiStatusDot;
+    const text = this.apiStatusText;
+    const badge = this.apiStatusBadge;
+    const corsNotice = document.getElementById('corsNotice');
+
     if (status === 'online') {
-      this.apiStatusBadge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold bg-emerald-950/40 text-emerald-400 border-emerald-800/50 hover:bg-emerald-900/40 transition-colors';
-      this.apiStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
-      this.apiStatusText.textContent = 'API متصل';
+      dot.className = 'w-2 h-2 rounded-full status-dot-online';
+      text.textContent = 'API متصل';
+      badge.style.color = '#4ade80';
+      badge.style.borderColor = 'rgba(74,222,128,0.2)';
+      if (corsNotice) corsNotice.classList.add('hidden');
     } else {
-      this.apiStatusBadge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold bg-rose-950/40 text-rose-400 border-rose-800/50 hover:bg-rose-900/40 transition-colors';
-      this.apiStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
-      this.apiStatusText.textContent = 'API غير متصل';
+      dot.className = 'w-2 h-2 rounded-full status-dot-offline';
+      text.textContent = 'API غير متصل';
+      badge.style.color = '#f87171';
+      badge.style.borderColor = 'rgba(248,113,113,0.2)';
+      if (corsNotice) corsNotice.classList.remove('hidden');
     }
   }
 }
