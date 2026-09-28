@@ -366,7 +366,6 @@ class DiwanApp {
     // Catalog elements
     this.erasTabsContainer = document.getElementById('erasTabsContainer');
     this.poetsGrid = document.getElementById('poetsGrid');
-    this.poetsSectionTitle = document.getElementById('poetsSectionTitle');
     this.poetsCountLabel = document.getElementById('poetsCountLabel');
     this.poetPoemsSection = document.getElementById('poetPoemsSection');
     this.poetPoemsGrid = document.getElementById('poetPoemsGrid');
@@ -377,22 +376,25 @@ class DiwanApp {
     // Poem reader elements
     this.poemEraBadge = document.getElementById('poemEraBadge');
     this.poemMeterBadge = document.getElementById('poemMeterBadge');
-    this.poemVersesCountBadge = document.getElementById('poemVersesCountBadge');
     this.poemTitle = document.getElementById('poemTitle');
     this.poemPoetName = document.getElementById('poemPoetName');
     this.versesListContainer = document.getElementById('versesListContainer');
     this.backToCatalogBtn = document.getElementById('backToCatalogBtn');
     this.copyFullPoemBtn = document.getElementById('copyFullPoemBtn');
     this.toggleDiacriticsBtn = document.getElementById('toggleDiacriticsBtn');
-    this.diacriticsStatusLabel = document.getElementById('diacriticsStatusLabel');
     this.increaseFontBtn = document.getElementById('increaseFontBtn');
     this.decreaseFontBtn = document.getElementById('decreaseFontBtn');
     this.fontSizeDisplay = document.getElementById('fontSizeDisplay');
 
-    // Search elements
-    this.globalSearchInput = document.getElementById('globalSearchInput');
-    this.clearSearchBtn = document.getElementById('clearSearchBtn');
-    this.searchDropdown = document.getElementById('searchDropdown');
+    // NEW: Zen Mode elements
+    this.zenModeToggleBtn = document.getElementById('zenModeToggleBtn');
+    this.exitZenModeBtn = document.getElementById('exitZenModeBtn');
+
+    // Search elements (Updated for Full Screen Overlay)
+    this.openSearchBtn = document.getElementById('openSearchBtn');
+    this.closeSearchBtn = document.getElementById('closeSearchBtn');
+    this.searchOverlay = document.getElementById('searchOverlay');
+    this.overlaySearchInput = document.getElementById('overlaySearchInput');
     this.searchResultsList = document.getElementById('searchResultsList');
 
     // Modals
@@ -411,7 +413,6 @@ class DiwanApp {
     this.apiBaseUrlInput = document.getElementById('apiBaseUrlInput');
     this.apiTokenInput = document.getElementById('apiTokenInput');
     this.saveApiSettingsBtn = document.getElementById('saveApiSettingsBtn');
-    this.resetApiSettingsBtn = document.getElementById('resetApiSettingsBtn');
     this.testApiPingBtn = document.getElementById('testApiPingBtn');
     this.pingStatusBox = document.getElementById('pingStatusBox');
 
@@ -491,30 +492,51 @@ class DiwanApp {
       });
     });
 
-    // Search events (live dynamic search)
-    this.globalSearchInput.addEventListener('input', (e) => {
+    // Zen Mode events
+    this.zenModeToggleBtn.addEventListener('click', () => {
+      document.body.classList.add('zen-mode');
+      showToast('أنت الآن في وضع القراءة الصافي. للعودة اضغط على الزر العائم يسار الشاشة.', 'info');
+    });
+    this.exitZenModeBtn.addEventListener('click', () => {
+      document.body.classList.remove('zen-mode');
+    });
+
+    // Search events (Overlay)
+    this.openSearchBtn.addEventListener('click', () => {
+      this.searchOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden'; // prevent bg scrolling
+      setTimeout(() => this.overlaySearchInput.focus(), 100);
+    });
+
+    this.closeSearchBtn.addEventListener('click', () => {
+      this.searchOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+      this.overlaySearchInput.value = '';
+      this.searchResultsList.innerHTML = '';
+    });
+
+    // Close on escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (this.searchOverlay.classList.contains('active')) {
+          this.searchOverlay.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+        if (document.body.classList.contains('zen-mode')) {
+          document.body.classList.remove('zen-mode');
+        }
+      }
+    });
+
+    this.overlaySearchInput.addEventListener('input', (e) => {
       const val = e.target.value;
       clearTimeout(this.searchDebounceTimer);
       if (val.trim()) {
-        this.clearSearchBtn.classList.remove('hidden');
         this.searchDebounceTimer = setTimeout(() => {
           this.performLiveSearch(val);
         }, 350);
       } else {
-        this.clearSearchBtn.classList.add('hidden');
-        this.searchDropdown.classList.add('hidden');
-      }
-    });
-
-    this.clearSearchBtn.addEventListener('click', () => {
-      this.globalSearchInput.value = '';
-      this.clearSearchBtn.classList.add('hidden');
-      this.searchDropdown.classList.add('hidden');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!this.globalSearchInput.contains(e.target) && !this.searchDropdown.contains(e.target)) {
-        this.searchDropdown.classList.add('hidden');
+        this.searchResultsList.innerHTML = '';
       }
     });
 
@@ -1179,12 +1201,11 @@ class DiwanApp {
   // ==========================================
   async performLiveSearch(query) {
     this.searchResultsList.innerHTML = `
-      <div class="p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-        <div class="w-4 h-4 border-2 border-[#c5a059] border-t-transparent rounded-full animate-spin"></div>
-        <span>جاري البحث في الخادم...</span>
+      <div style="padding:2rem;text-align:center;color:var(--charcoal-light);font-size:0.9rem">
+        <div style="display:inline-block;width:20px;height:20px;border:2px solid var(--sage-light);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:10px"></div>
+        <div>جاري البحث في الخادم...</div>
       </div>
     `;
-    this.searchDropdown.classList.remove('hidden');
 
     try {
       const results = await this.api.search(query);
@@ -1192,7 +1213,7 @@ class DiwanApp {
 
       if (!results || results.length === 0) {
         this.searchResultsList.innerHTML = `
-          <div class="p-4 text-center text-xs text-slate-400">
+          <div style="padding:2rem;text-align:center;color:var(--charcoal-light);font-size:1.1rem">
             لم يتم العثور على نتائج مطابقة لـ «${escapeHtml(query)}» في الخادم
           </div>
         `;
@@ -1201,38 +1222,27 @@ class DiwanApp {
 
       results.forEach(res => {
         const item = document.createElement('div');
-        item.className = 'p-3 hover:bg-[#1f2a3a] cursor-pointer flex items-center justify-between gap-3 text-right transition-colors';
+        item.className = 'search-item';
         
-        let badgeLabel = 'قصيدة';
         let icon = 'book-open';
-        if (res.type === 'poet') {
-          badgeLabel = 'شاعر';
-          icon = 'user';
-        } else if (res.type === 'verse') {
-          badgeLabel = 'بيت شعري';
-          icon = 'feather';
-        }
+        if (res.type === 'poet') icon = 'user';
+        else if (res.type === 'verse') icon = 'feather';
 
         item.innerHTML = `
-          <div class="flex items-center gap-2.5 overflow-hidden">
-            <div class="w-8 h-8 rounded-lg bg-[#121924] border border-[#2a374a] flex items-center justify-center text-[#c5a059] flex-shrink-0">
-              <i data-lucide="${icon}" class="w-4 h-4"></i>
-            </div>
-            <div class="truncate">
-              <p class="text-xs font-bold text-white truncate">${escapeHtml(res.title)}</p>
-              <p class="text-[11px] text-slate-400 truncate">${escapeHtml(res.subtitle)}</p>
-            </div>
+          <div class="search-item-icon">
+            <i data-lucide="${icon}" style="width:16px;height:16px"></i>
           </div>
-          <span class="text-[10px] px-2 py-0.5 rounded bg-[#121924] text-[#dfc185] border border-[#2a374a] whitespace-nowrap">
-            ${badgeLabel}
-          </span>
+          <div class="search-item-content">
+            <div class="search-item-title">${escapeHtml(res.title)}</div>
+            <div class="search-item-sub">${escapeHtml(res.subtitle)}</div>
+          </div>
         `;
 
         item.addEventListener('click', () => {
-          this.searchDropdown.classList.add('hidden');
-          this.globalSearchInput.value = '';
-          this.clearSearchBtn.classList.add('hidden');
-
+          this.searchOverlay.classList.remove('active');
+          document.body.style.overflow = '';
+          this.overlaySearchInput.value = '';
+          
           if (res.type === 'poet') {
             this.switchView('catalog');
             this.loadPoetPoems(res.data);
@@ -1248,9 +1258,9 @@ class DiwanApp {
     } catch (err) {
       console.error('Search error:', err);
       this.searchResultsList.innerHTML = `
-        <div class="p-4 text-center text-xs text-rose-400 space-y-1">
-          <p>تعذر إتمام البحث عبر الخادم</p>
-          <p class="text-[10px] text-slate-400">${escapeHtml(err.message)}</p>
+        <div style="padding:2rem;text-align:center;color:var(--terracotta);">
+          <p style="font-size:1.1rem;margin-bottom:5px">تعذر إتمام البحث عبر الخادم</p>
+          <p style="font-size:0.8rem;opacity:0.8">${escapeHtml(err.message)}</p>
         </div>
       `;
     }
