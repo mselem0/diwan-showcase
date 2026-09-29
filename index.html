@@ -25,7 +25,7 @@
     <div class="grain" aria-hidden="true"></div>
     <header class="topbar">
       <a class="brand" href="#" data-home
-        ><span class="brand-mark">م</span
+        ><span class="brand-mark"><img src="assets/mishkat-logo.png" alt="" /></span
         ><span><b>مِشكاة</b><small>مختبر الديوان الشعري</small></span></a
       >
       <nav class="top-actions">
@@ -37,45 +37,21 @@
       </nav>
     </header>
     <main>
-      <section class="hero" id="home">
-        <div class="hero-copy">
-          <p class="eyebrow">تجربة حية · لا بيانات تجريبية</p>
-          <h1>الشعر، حين يصبح<br /><em>مساحة للاكتشاف.</em></h1>
-          <p class="hero-lead">
-            تجوّل بين العصور، لاحق القافية، اختبر إيقاع السطر، ودع المصادفة
-            تقودك إلى قصيدة لم تكن تبحث عنها.
-          </p>
-          <div class="hero-actions">
-            <button class="primary" data-surprise>
-              فاجئني بقصيدة <span>↙</span></button
-            ><button class="text-button" data-open-explorer>
-              افتح مستكشف الشعر
-            </button>
-          </div>
-        </div>
-        <div class="hero-orbit" aria-label="إحصاءات المكتبة">
-          <div class="orbit-ring"></div>
-          <div class="orbit-ring second"></div>
-          <div class="orbit-center"><span>API</span><b>حيّة</b></div>
-          <article><b data-stat-poems>—</b><span>قصيدة</span></article>
-          <article><b data-stat-poets>—</b><span>شاعرًا</span></article>
-          <article><b data-stat-eras>—</b><span>عصرًا</span></article>
-        </div>
-      </section>
-      <section class="marquee" aria-hidden="true">
-        <div>
-          عَمُودِيّ · نَثْرِيّ · تَفْعِيلَة · بُحُور · قَوَافٍ · عُصُور ·
-          عَمُودِيّ · نَثْرِيّ · تَفْعِيلَة · بُحُور · قَوَافٍ · عُصُور ·
-        </div>
-      </section>
       <section class="experience" id="explorer">
-        <header class="section-header">
-          <div>
-            <p class="eyebrow">مستكشف الشعر</p>
-            <h2>ابدأ من إحساس، لا من فهرس.</h2>
+        <div class="explorer-stage" data-mascot-stage>
+          <div class="explorer-copy">
+            <p class="eyebrow">مستكشف الشعر العربي · بيانات حيّة</p>
+            <h1>قصيدتك التالية<br /><em>تبدأ من هنا.</em></h1>
+            <p>اختر إحساسًا أو عصرًا أو قافية، أو دع شاعرنا يقودك إلى قصيدة بالمصادفة.</p>
+            <div class="live-stats"><span><b data-stat-poems>—</b> قصيدة</span><span><b data-stat-poets>—</b> شاعرًا</span><span><b data-stat-eras>—</b> عصرًا</span></div>
           </div>
-          <p>كل اختيار يرسل طلبًا حقيقيًا إلى API ويعيد تشكيل الرحلة أمامك.</p>
-        </header>
+          <div class="mascot-wrap" data-mascot>
+            <div class="speech-bubble" data-speech><span></span><i></i></div>
+            <img src="assets/poet-mascot.png" alt="شخصية شاعر مِشكاة التفاعلية" />
+            <button class="mascot-action" data-surprise>اختر لي قصيدة ✦</button>
+          </div>
+        </div>
+        <header class="explorer-title"><div><p class="eyebrow">اصنع مسارك</p><h2>ابدأ من إحساس، لا من فهرس.</h2></div><p>كل اختيار يرسل طلبًا حقيقيًا إلى API ويعيد تشكيل النتائج أمامك.</p></header>
         <div class="filter-rail">
           <label
             ><span>النمط</span
@@ -162,7 +138,7 @@
     </main>
     <footer>
       <div class="brand">
-        <span class="brand-mark">م</span
+        <span class="brand-mark"><img src="assets/mishkat-logo.png" alt="" /></span
         ><span><b>مِشكاة</b><small>تجربة مبنية على AlDiwan API</small></span>
       </div>
       <p>ما يمكن أن تبنيه القصيدة حين تصبح بيانات حيّة.</p>

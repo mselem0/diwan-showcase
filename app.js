@@ -98,6 +98,7 @@ class Mishkat {
     };
     this.searchTimer = null;
     this.bind();
+    this.initMascot();
     this.paintSkeletons();
     if (this.api.key) this.boot();
     else setTimeout(() => this.openSettings(), 250);
@@ -148,7 +149,6 @@ class Mishkat {
       location.hash = "poets";
       this.toast("اختر شاعرًا لبناء كوكبته");
     };
-    $("[data-open-explorer]").onclick = () => (location.hash = "explorer");
     $("[data-home]").onclick = (e) => {
       e.preventDefault();
       scrollTo({ top: 0, behavior: "smooth" });
@@ -164,6 +164,39 @@ class Mishkat {
     $("[data-copy]").onclick = () => this.copyPoem();
     $("[data-console-toggle]").onclick = () =>
       $("[data-api-console]").classList.toggle("open");
+  }
+  initMascot() {
+    const stage = $("[data-mascot-stage]"), mascot = $("[data-mascot]");
+    const phrases = [
+      "الشعر حيث يصبح مساحة",
+      "ما القافية التي تشبه مزاجك اليوم؟",
+      "دعني أختار لك بيتًا لا يُنسى",
+      "لكل عصر صوته… أيّها تريد أن تسمع؟",
+    ];
+    let phraseIndex = 0, timer;
+    const speak = (text) => {
+      const target = $("[data-speech] span");
+      clearInterval(timer); target.textContent = ""; let i = 0;
+      timer = setInterval(() => {
+        target.textContent += text.charAt(i++);
+        if (i >= text.length) clearInterval(timer);
+      }, 48);
+    };
+    speak(phrases[0]);
+    setInterval(() => { phraseIndex = (phraseIndex + 1) % phrases.length; speak(phrases[phraseIndex]); }, 7000);
+    mascot.addEventListener("click", (event) => {
+      if (event.target.closest("button")) return;
+      phraseIndex = (phraseIndex + 1) % phrases.length; speak(phrases[phraseIndex]);
+    });
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      stage.addEventListener("pointermove", (event) => {
+        const box = stage.getBoundingClientRect();
+        const x = (event.clientX - box.left) / box.width - 0.5;
+        const y = (event.clientY - box.top) / box.height - 0.5;
+        mascot.style.transform = `perspective(900px) rotateY(${x * -7}deg) rotateX(${y * 5}deg)`;
+      });
+      stage.addEventListener("pointerleave", () => { mascot.style.transform = ""; });
+    }
   }
   paintSkeletons() {
     $("[data-poem-grid]").innerHTML = '<i class="skeleton"></i>'.repeat(6);
