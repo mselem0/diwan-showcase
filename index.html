@@ -181,19 +181,30 @@
           <span>بصمة الإيقاع</span>
           <div data-rhythm></div>
         </div>
-        <section class="recitation" data-recitation hidden>
-          <span class="recitation-kicker">إلقاء مقترح من YouTube</span>
-          <button class="recitation-preview" data-recitation-play type="button">
-            <img data-recitation-image alt="" />
-            <i aria-hidden="true">▶</i>
-          </button>
-          <strong data-recitation-title></strong>
-          <small data-recitation-channel></small>
-          <a data-recitation-link target="_blank" rel="noopener">المشاهدة على YouTube ↗</a>
-          <div class="recitation-player" data-recitation-player></div>
-        </section>
       </aside>
       <article class="poem-sheet">
+        <section class="recitation" data-recitation hidden>
+          <div class="recitation-visual">
+            <img data-recitation-image alt="" />
+            <span class="recitation-glow"></span>
+            <button class="recitation-play" data-recitation-play type="button" aria-label="تشغيل الإلقاء">
+              <i aria-hidden="true">▶</i>
+            </button>
+          </div>
+          <div class="recitation-copy">
+            <span class="recitation-kicker">استمع إلى القصيدة · YouTube</span>
+            <strong data-recitation-title></strong>
+            <small data-recitation-channel></small>
+            <div class="recitation-wave" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <div class="recitation-actions">
+              <button data-recitation-play-secondary type="button">تشغيل الإلقاء</button>
+              <a data-recitation-link target="_blank" rel="noopener">فتح في YouTube ↗</a>
+            </div>
+          </div>
+          <div class="recitation-player" data-recitation-player></div>
+        </section>
         <div class="poem-lines" data-poem-lines></div>
         <a data-attribution target="_blank" rel="noopener"></a>
       </article>

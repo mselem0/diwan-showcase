@@ -421,11 +421,13 @@ class Mishkat {
       $("[data-recitation-title]").textContent = data.title || "إلقاء القصيدة";
       $("[data-recitation-channel]").textContent = data.channel || "YouTube";
       $("[data-recitation-link]").href = data.watch_url;
-      $("[data-recitation-play]").onclick = () => {
+      const play = () => {
         $("[data-recitation-player]").innerHTML = `<iframe src="${esc(data.embed_url)}?autoplay=1&playsinline=1" title="${esc(data.title || "إلقاء القصيدة")}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
-        $("[data-recitation-play]").hidden = true;
+        box.classList.add("is-playing");
       };
-      $("[data-recitation-play]").hidden = false;
+      $("[data-recitation-play]").onclick = play;
+      $("[data-recitation-play-secondary]").onclick = play;
+      box.classList.remove("is-playing");
       box.hidden = false;
     } catch (_) {
       box.hidden = true;

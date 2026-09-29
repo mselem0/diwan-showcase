@@ -672,9 +672,76 @@ body.connected .api-console i {
   min-height: 5px;
 }
 .recitation {
-  margin-top: 34px;
-  padding-top: 24px;
-  border-top: 1px solid var(--line);
+  position: relative;
+  width: min(960px, 100%);
+  min-height: 330px;
+  margin: 0 auto 80px;
+  display: grid;
+  grid-template-columns: minmax(270px, 0.8fr) 1.2fr;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 30px 80px rgba(17, 16, 14, 0.22);
+}
+.recitation[hidden] { display: none; }
+.recitation-visual { position: relative; min-height: 330px; overflow: hidden; }
+.recitation-visual > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.7) contrast(1.08);
+  transform: scale(1.04);
+}
+.recitation-visual:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(17, 16, 14, 0.82), transparent 65%);
+}
+.recitation-glow {
+  position: absolute;
+  z-index: 1;
+  inset: 50% auto auto 50%;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgba(181, 138, 59, 0.28);
+  filter: blur(35px);
+  transform: translate(-50%, -50%);
+}
+.recitation-play {
+  position: absolute;
+  z-index: 2;
+  inset: 50% auto auto 50%;
+  width: 92px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  background: rgba(243, 238, 228, 0.92);
+  color: var(--ink);
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.recitation-play:hover { transform: translate(-50%, -50%) scale(1.08); background: var(--gold); }
+.recitation-play i { margin-left: -4px; font-size: 27px; font-style: normal; }
+.recitation-copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 46px 52px;
+  overflow: hidden;
+}
+.recitation-copy:before {
+  content: "صوت";
+  position: absolute;
+  inset: auto auto -45px -8px;
+  color: rgba(255, 255, 255, 0.035);
+  font: 700 170px/1 var(--serif);
 }
 .recitation-kicker,
 .recitation small,
@@ -683,44 +750,33 @@ body.connected .api-console i {
   display: block;
 }
 .recitation-kicker {
-  margin-bottom: 12px;
-  color: #8b641f;
-  font-size: 9px;
+  margin-bottom: 16px;
+  color: var(--gold);
+  font-size: 10px;
 }
-.recitation-preview {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border: 0;
-  border-radius: 14px;
-  background: var(--ink);
-  cursor: pointer;
+.recitation strong { position: relative; font: 700 clamp(24px, 2.4vw, 35px)/1.55 var(--serif); }
+.recitation small { position: relative; margin-top: 7px; color: #a9a094; font-size: 10px; }
+.recitation-wave { height: 60px; display: flex; align-items: center; gap: 4px; margin: 24px 0; direction: ltr; }
+.recitation-wave i { width: 3px; height: 22%; border-radius: 4px; background: var(--gold); animation:audioWave 1.5s ease-in-out infinite alternate; }
+.recitation-wave i:nth-child(3n) { height: 75%; animation-delay: -.8s; }
+.recitation-wave i:nth-child(4n) { height: 42%; animation-delay: -.35s; }
+.recitation-wave i:nth-child(5n) { height: 95%; animation-delay: -1.1s; }
+@keyframes audioWave { to { transform: scaleY(1.55); opacity: .55; } }
+.recitation-actions { position: relative; display: flex; align-items: center; gap: 18px; }
+.recitation-actions button { border: 0; border-radius: 999px; padding: 13px 22px; background: var(--gold); color: var(--ink); font: 600 10px var(--kufi); cursor: pointer; }
+.recitation-actions a { color: #bdb5a8; font-size: 9px; }
+.recitation-player { display: none; grid-column: 1 / -1; background: #000; }
+.recitation-player iframe { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; }
+.recitation.is-playing { display: block; }
+.recitation.is-playing .recitation-visual,
+.recitation.is-playing .recitation-copy { display: none; }
+.recitation.is-playing .recitation-player { display: block; }
+@media (max-width: 720px) {
+  .recitation { grid-template-columns: 1fr; margin-bottom: 50px; border-radius: 20px; }
+  .recitation-visual { min-height: 230px; }
+  .recitation-copy { padding: 32px 26px 38px; }
+  .recitation-wave { height: 46px; }
 }
-.recitation-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.72;
-}
-.recitation-preview i {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--gold);
-  color: var(--ink);
-  font-style: normal;
-  transform: translate(-50%, -50%);
-}
-.recitation strong { margin-top: 13px; font: 700 16px/1.6 var(--serif); }
-.recitation small { margin-top: 3px; color: var(--muted); font-size: 9px; }
-.recitation > a { margin-top: 10px; color: var(--red); font-size: 9px; }
-.recitation-player { margin-top: 12px; }
-.recitation-player iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 14px; }
 .poem-sheet {
   overflow: auto;
   padding: 11vh 8vw;
