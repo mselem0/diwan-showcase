@@ -163,7 +163,6 @@ class Mishkat {
       this.state.poetsPage++;
       this.loadPoets(true);
     };
-    $("[data-close-reader]").onclick = () => $("[data-reader]").close();
     $("[data-font-up]").onclick = () => this.font(0.1);
     $("[data-font-down]").onclick = () => this.font(-0.1);
     $("[data-toggle-diacritics]").onclick = () => this.toggleDiacritics();
