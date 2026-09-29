@@ -1,559 +1,906 @@
-/* ==========================================================
-   رَوَائِعُ الدِّيوَان — Editorial Zen Design
-   Andalusian Earth Palette (Sage, Sand, Charcoal, Terracotta)
-   ========================================================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Reem+Kufi:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700&display=swap');
-
 :root {
-  /* Andalusian Earth Palette */
-  --sand:       #FBF9F6;
-  --sand-dark:  #F0EBE1;
-  --charcoal:   #2C302E;
-  --charcoal-light: #5C635F;
-  --sage:       #4A5D4E;
-  --sage-light: #7B8F7F;
-  --terracotta: #C2847A;
-  
-  --border:     rgba(44, 48, 46, 0.08);
-  --border-hover: rgba(74, 93, 78, 0.3);
-  
-  --radius:     8px;
-  --ease:       cubic-bezier(0.4, 0, 0.2, 1);
+  --ink: #11100e;
+  --paper: #f3eee4;
+  --paper2: #e8dfd0;
+  --gold: #b58a3b;
+  --red: #8c2e25;
+  --muted: #766f64;
+  --line: rgba(17, 16, 14, 0.14);
+  --serif: "Amiri", serif;
+  --kufi: "Noto Kufi Arabic", sans-serif;
 }
-
-*, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
 body {
-  font-family: 'Cairo', sans-serif;
-  background: var(--sand);
-  color: var(--charcoal);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  -webkit-font-smoothing: antialiased;
-  transition: background-color 0.5s var(--ease);
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--kufi);
+  overflow-x: hidden;
 }
-
-/* SCROLLBAR */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--sand); }
-::-webkit-scrollbar-thumb { background: var(--charcoal-light); border-radius: 2px; }
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* ─── TYPOGRAPHY ─── */
-.kufi { font-family: 'Reem Kufi', sans-serif; }
-.amiri { font-family: 'Amiri', serif; }
-
-/* ─── NAVBAR ─── */
-.site-nav {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background: rgba(251, 249, 246, 0.95);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  transition: transform 0.4s var(--ease), opacity 0.4s;
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-
-.nav-inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  height: 64px;
+.topbar {
+  height: 84px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 clamp(20px, 5vw, 76px);
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  border-bottom: 1px solid rgba(243, 238, 228, 0.13);
+  color: var(--paper);
 }
-
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
   text-decoration: none;
+  color: inherit;
 }
-.brand-icon {
-  font-size: 1.5rem;
-  color: var(--sage);
-}
-.brand-name {
-  font-family: 'Reem Kufi', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--charcoal);
-  line-height: 1;
-}
-
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* NAV CONTROLS */
-.api-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 100px;
-  background: transparent;
-  border: 1px solid var(--border);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--charcoal-light);
-  cursor: pointer;
-  transition: all 0.2s var(--ease);
-}
-.api-badge:hover { background: var(--sand-dark); color: var(--charcoal); }
-
-.status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.status-online  { background: var(--sage); }
-.status-offline { background: var(--terracotta); }
-.status-pending { background: var(--sage-light); animation: blink 1.4s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-.icon-btn {
-  width: 38px; height: 38px;
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
   border-radius: 50%;
-  border: none;
-  background: transparent;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--charcoal);
-  cursor: pointer;
-  transition: all 0.2s var(--ease);
+  font: 700 26px var(--serif);
 }
-.icon-btn:hover { background: var(--sand-dark); color: var(--sage); }
-
-/* ─── FULL-SCREEN SEARCH OVERLAY ─── */
-.search-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgba(251, 249, 246, 0.98);
-  backdrop-filter: blur(15px);
+.brand b,
+.brand small {
+  display: block;
+}
+.brand b {
+  font-size: 15px;
+}
+.brand small {
+  font-size: 9px;
+  opacity: 0.65;
+  margin-top: 3px;
+}
+.top-actions {
   display: flex;
-  flex-direction: column;
-  padding: 4rem 2rem;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s var(--ease);
+  gap: 10px;
 }
-.search-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
+.ghost,
+.connection,
+.text-button,
+.icon-button,
+.filter-go,
+.primary,
+.reader-tools button {
+  font: 500 12px var(--kufi);
+  cursor: pointer;
 }
-.search-overlay-header {
-  max-width: 800px; width: 100%; margin: 0 auto;
-  position: relative;
-}
-.search-input-huge {
-  width: 100%;
+.ghost,
+.connection {
+  height: 42px;
+  border: 1px solid rgba(243, 238, 228, 0.22);
   background: transparent;
-  border: none;
-  border-bottom: 2px solid var(--sage);
-  font-family: 'Reem Kufi', sans-serif;
-  font-size: clamp(2rem, 5vw, 3rem);
-  color: var(--charcoal);
-  padding: 10px 50px 10px 0;
+  color: inherit;
+  border-radius: 30px;
+  padding: 0 16px;
+}
+.ghost kbd {
+  margin-right: 12px;
+  opacity: 0.45;
+  font-family: inherit;
+}
+.connection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.connection i,
+.api-console i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #c45e50;
+  box-shadow: 0 0 0 4px rgba(196, 94, 80, 0.12);
+}
+body.connected .connection i,
+body.connected .api-console i {
+  background: #7da272;
+  box-shadow: 0 0 0 4px rgba(125, 162, 114, 0.14);
+}
+.hero {
+  min-height: 780px;
+  background: var(--ink);
+  color: var(--paper);
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  padding: 130px clamp(24px, 8vw, 130px) 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero:before {
+  content: "ض";
+  position: absolute;
+  font: 700 640px/1 var(--serif);
+  color: rgba(243, 238, 228, 0.025);
+  left: -40px;
+  bottom: -150px;
+}
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  font-weight: 700;
+  margin: 0 0 18px;
+}
+.hero h1 {
+  font: 400 clamp(54px, 7vw, 104px) / 1.06 var(--serif);
+  margin: 0;
+  letter-spacing: -0.04em;
+}
+.hero h1 em {
+  color: var(--gold);
+  font-weight: 400;
+}
+.hero-lead {
+  max-width: 620px;
+  color: #bdb5a8;
+  line-height: 2;
+  font-size: 14px;
+  margin: 34px 0;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.primary {
+  border: 0;
+  background: var(--gold);
+  color: var(--ink);
+  padding: 15px 24px;
+  border-radius: 2px;
+}
+.primary span {
+  margin-right: 28px;
+}
+.text-button {
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  padding: 8px 0;
+}
+.hero-orbit {
+  width: min(40vw, 500px);
+  aspect-ratio: 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin: auto;
+}
+.orbit-ring {
+  position: absolute;
+  inset: 8%;
+  border: 1px solid rgba(181, 138, 59, 0.32);
+  border-radius: 50%;
+  animation: spin 32s linear infinite;
+}
+.orbit-ring:after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--gold);
+  top: 14%;
+  right: 13%;
+}
+.orbit-ring.second {
+  inset: 24%;
+  border-style: dashed;
+  animation-direction: reverse;
+  animation-duration: 24s;
+}
+.orbit-center {
+  text-align: center;
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  display: grid;
+  place-content: center;
+}
+.orbit-center span {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+}
+.orbit-center b {
+  font: 32px var(--serif);
+}
+.hero-orbit article {
+  position: absolute;
+  text-align: center;
+}
+.hero-orbit article b {
+  display: block;
+  font: 32px var(--serif);
+  color: var(--gold);
+}
+.hero-orbit article span {
+  font-size: 9px;
+  color: #aaa095;
+}
+.hero-orbit article:nth-of-type(1) {
+  top: 3%;
+  right: 42%;
+}
+.hero-orbit article:nth-of-type(2) {
+  right: 0;
+  bottom: 25%;
+}
+.hero-orbit article:nth-of-type(3) {
+  left: 4%;
+  bottom: 25%;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.marquee {
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+  color: var(--red);
+  font: 20px var(--serif);
+  padding: 17px 0;
+}
+.marquee div {
+  display: inline-block;
+  animation: marquee 30s linear infinite;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(50%);
+  }
+}
+.experience,
+.catalogue {
+  padding: 110px clamp(24px, 7vw, 110px);
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 30px;
+  margin-bottom: 44px;
+}
+.section-header h2 {
+  font: 400 clamp(38px, 5vw, 68px) / 1.2 var(--serif);
+  margin: 0;
+}
+.section-header > p {
+  max-width: 420px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 2;
+}
+.filter-rail {
+  border-block: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr) auto;
+}
+.filter-rail label {
+  padding: 18px;
+  border-left: 1px solid var(--line);
+}
+.filter-rail label span {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.filter-rail select {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font: 600 12px var(--kufi);
   outline: none;
 }
-.search-input-huge::placeholder { color: var(--border); }
-.search-close-btn {
-  position: absolute;
-  left: 0; top: 50%; transform: translateY(-50%);
-  background: none; border: none; cursor: pointer;
-  color: var(--charcoal-light);
-  width: 40px; height: 40px;
-  display: flex; align-items: center; justify-content: center;
+.filter-go {
+  border: 0;
+  background: var(--red);
+  color: white;
+  padding: 0 28px;
 }
-.search-close-btn:hover { color: var(--terracotta); }
-
-.search-results-container {
-  max-width: 800px; width: 100%; margin: 2rem auto 0;
-  overflow-y: auto; flex: 1;
-  padding-bottom: 2rem;
-}
-.search-item {
-  display: flex; align-items: flex-start; gap: 1rem;
-  padding: 1.25rem 0;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: padding 0.2s var(--ease);
-}
-.search-item:hover {
-  padding-right: 1rem;
-  border-bottom-color: var(--sage-light);
-}
-.search-item-icon {
-  width: 32px; height: 32px;
-  border-radius: 50%; background: var(--sand-dark);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--sage); font-size: 0.9rem; flex-shrink: 0;
-}
-.search-item-content { flex: 1; }
-.search-item-title { font-family: 'Amiri', serif; font-size: 1.2rem; font-weight: 700; color: var(--charcoal); line-height: 1.4; }
-.search-item-sub { font-size: 0.8rem; color: var(--charcoal-light); margin-top: 4px; }
-
-/* ─── HERO ─── */
-.hero {
-  padding: 5rem 1.5rem 4rem;
-  text-align: center;
-  border-bottom: 1px solid var(--border);
-  transition: opacity 0.4s, transform 0.4s;
-}
-.hero-verse {
-  font-family: 'Amiri', serif;
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
-  line-height: 1.8;
-  color: var(--charcoal);
-  max-width: 800px;
-  margin: 0 auto 1.5rem;
-}
-.hero-stats {
-  font-size: 0.85rem;
-  color: var(--charcoal-light);
-  font-family: 'Reem Kufi', sans-serif;
-  letter-spacing: 0.05em;
-  display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;
-}
-.hero-stats b { color: var(--sage); font-size: 1rem; }
-.hero-stats-sep { color: var(--border); }
-
-/* ─── MAIN LAYOUT ─── */
-.main-wrap {
-  flex: 1;
-  max-width: 1000px; /* Narrower for editorial feel */
-  width: 100%;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem 4rem;
-}
-
-/* BREADCRUMB */
-.breadcrumb {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 0.75rem; color: var(--charcoal-light);
-  margin-bottom: 2.5rem; flex-wrap: wrap;
-  transition: opacity 0.3s;
-}
-.crumb-btn {
-  display: flex; align-items: center; gap: 4px;
-  color: var(--charcoal-light); cursor: pointer;
-  background: none; border: none; font-family: 'Cairo', sans-serif;
-  transition: color 0.15s;
-}
-.crumb-btn:hover { color: var(--sage); }
-.crumb-sep { color: var(--border); }
-.crumb-active { color: var(--sage); font-weight: 600; }
-
-/* ─── EDITORIAL LISTS (ERA TABS) ─── */
-.section-head { margin-bottom: 1.5rem; }
-.section-title {
-  font-family: 'Reem Kufi', sans-serif;
-  font-size: 1.2rem; font-weight: 700;
-  color: var(--charcoal);
-  display: flex; align-items: center; gap: 8px;
-}
-.section-icon { color: var(--sage); }
-
-.era-tabs {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-}
-.era-tab {
-  padding: 6px 0;
-  background: transparent; border: none;
-  color: var(--charcoal-light);
-  font-size: 0.85rem; font-weight: 500; font-family: 'Cairo', sans-serif;
-  cursor: pointer; white-space: nowrap;
-  position: relative;
-  transition: color 0.2s var(--ease);
-}
-.era-tab::after {
-  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-  height: 2px; background: var(--sage);
-  transform: scaleX(0); transform-origin: right;
-  transition: transform 0.2s var(--ease);
-}
-.era-tab:hover { color: var(--charcoal); }
-.era-tab.active { color: var(--sage); font-weight: 700; }
-.era-tab.active::after { transform: scaleX(1); }
-.era-tab-count { font-size: 0.65rem; margin-right: 4px; opacity: 0.6; }
-
-/* ─── EDITORIAL CARDS (POETS & POEMS) ─── */
-.poet-grid, .poem-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
-}
-
-/* Borderless Design */
-.poet-card, .poem-card {
-  background: transparent;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: all 0.3s var(--ease);
-  display: flex; flex-direction: column; gap: 10px;
-}
-.poet-card:hover, .poem-card:hover {
-  background: rgba(74, 93, 78, 0.03); /* Subtle Sage */
-  padding-right: 1rem; padding-left: 1rem;
-  border-bottom-color: transparent;
-  border-radius: var(--radius);
-}
-
-.poet-card-top { display: flex; align-items: center; gap: 12px; }
-.poet-name {
-  font-family: 'Reem Kufi', sans-serif;
-  font-size: 1.1rem; font-weight: 700; color: var(--charcoal);
-}
-.poet-bio {
-  font-size: 0.8rem; color: var(--charcoal-light); line-height: 1.7;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-}
-
-.poem-title {
-  font-family: 'Amiri', serif;
-  font-size: 1.25rem; font-weight: 700; color: var(--charcoal);
-  line-height: 1.5;
-}
-.poem-snippet {
-  font-family: 'Amiri', serif;
-  font-size: 0.95rem; color: var(--charcoal-light); font-style: italic;
-  line-height: 1.8;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-}
-.poem-meta {
-  font-size: 0.75rem; color: var(--sage-light); font-weight: 500;
-  margin-top: auto; padding-top: 8px;
-}
-
-.poet-section-divider {
-  margin-top: 3rem; padding-top: 2rem;
-  border-top: 2px dashed var(--border);
-}
-
-/* ─── POEM READER (ZEN READY) ─── */
-.reader-header {
-  margin-bottom: 3rem;
-  transition: opacity 0.4s var(--ease), transform 0.4s;
-}
-.poem-big-title {
-  font-family: 'Amiri', serif;
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
-  font-weight: 700; color: var(--charcoal);
-  line-height: 1.4; margin-bottom: 10px;
-}
-.poem-author-line {
-  font-size: 0.9rem; color: var(--charcoal-light);
-  display: flex; align-items: center; gap: 8px;
-}
-
-/* TOOLBAR */
-.toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 1.5rem; }
-.tb-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 14px;
-  border-radius: 100px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--charcoal-light);
-  font-size: 0.8rem; font-weight: 600;
-  font-family: 'Cairo', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s var(--ease);
-}
-.tb-btn:hover { border-color: var(--charcoal); color: var(--charcoal); }
-.tb-btn.active { border-color: var(--sage); color: var(--sage); background: rgba(74,93,78,0.05); }
-
-/* ─── VERSES ─── */
-.verses-wrap {
-  position: relative;
-  transition: all 0.5s var(--ease);
-}
-.verse-row {
-  display: grid;
-  grid-template-columns: 1fr 20px 1fr;
-  align-items: baseline;
-  padding: 1.25rem 0;
-  border-bottom: 1px solid rgba(44,48,46,0.03);
-  transition: all 0.3s var(--ease);
-  position: relative;
-}
-.verse-row:hover {
-  background: rgba(74,93,78,0.02);
-}
-
-.verse-sadr {
-  font-family: 'Amiri', serif;
-  text-align: right; direction: rtl;
-  color: var(--charcoal);
-  line-height: 2.2;
-}
-.verse-ajuz {
-  font-family: 'Amiri', serif;
-  text-align: right; direction: rtl;
-  color: var(--charcoal-light);
-  line-height: 2.2;
-}
-.verse-num {
-  position: absolute; right: -2rem; top: 50%; transform: translateY(-50%);
-  font-size: 0.65rem; color: var(--border);
-}
-
-.verse-separator {
-  color: var(--sage);
-  font-size: 0.8rem;
-  opacity: 0.4;
+.results-head {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  margin: 35px 0 20px;
+  color: var(--muted);
+  font-size: 11px;
 }
-
-.verse-quote-btn {
-  position: absolute; left: -2rem; top: 50%; transform: translateY(-50%);
-  background: var(--sand-dark);
-  border: 1px solid var(--border);
-  color: var(--sage);
-  width: 32px; height: 32px;
+.results-head > div {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.icon-button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  background: transparent;
   border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
+}
+.poem-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+.poem-card {
+  min-height: 270px;
+  padding: 28px;
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  text-align: right;
   cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+.poem-card:hover {
+  background: var(--ink);
+  color: var(--paper);
+  transform: translateY(-4px);
+}
+.style-pill {
+  font-size: 9px;
+  color: var(--red);
+  letter-spacing: 0.1em;
+}
+.poem-card:hover .style-pill {
+  color: var(--gold);
+}
+.poem-card h3 {
+  font: 700 25px/1.5 var(--serif);
+  margin: 24px 0 10px;
+}
+.poem-card blockquote {
+  font: 18px/1.8 var(--serif);
+  color: var(--muted);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.poem-card:hover blockquote {
+  color: #bdb5a8;
+}
+.poem-card footer {
+  margin-top: auto;
+  padding: 18px 0 0;
+  border: 0;
+  font-size: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+.skeleton {
+  animation: pulse 1.3s infinite;
+  background: rgba(17, 16, 14, 0.06);
+  min-height: 270px;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+.laboratory {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 100px clamp(24px, 7vw, 110px);
+}
+.section-header.light {
+  margin-bottom: 55px;
+}
+.lab-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid rgba(243, 238, 228, 0.13);
+}
+.lab-card {
+  min-height: 310px;
+  text-align: right;
+  padding: 30px;
+  border: 0;
+  border-left: 1px solid rgba(243, 238, 228, 0.13);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: 0.35s;
+}
+.lab-card:last-child {
+  border-left: 0;
+}
+.lab-card:hover {
+  background: var(--gold);
+  color: var(--ink);
+  transform: translateY(-8px);
+}
+.lab-card span {
+  font: italic 15px var(--serif);
+  color: var(--gold);
+}
+.lab-card:hover span {
+  color: var(--red);
+}
+.lab-card b {
+  font: 28px var(--serif);
+  margin: 50px 0 14px;
+}
+.lab-card p {
+  font-size: 11px;
+  color: #9b9286;
+  line-height: 2;
+}
+.lab-card:hover p {
+  color: rgba(17, 16, 14, 0.7);
+}
+.lab-card i {
+  font-style: normal;
+  font-size: 10px;
+  margin-top: auto;
+}
+.era-strip {
+  display: flex;
+  gap: 8px;
+  overflow: auto;
+  padding-bottom: 20px;
+}
+.era-chip {
+  white-space: nowrap;
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: 30px;
+  padding: 9px 15px;
+  font: 500 10px var(--kufi);
+  cursor: pointer;
+}
+.era-chip.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+.poet-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  margin-top: 20px;
+}
+.poet-card {
+  border: 0;
+  background: var(--paper);
+  padding: 28px;
+  min-height: 170px;
+  text-align: right;
+  cursor: pointer;
+}
+.poet-card b {
+  font: 700 24px var(--serif);
+}
+.poet-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 12px;
+}
+.poet-card:hover {
+  background: var(--paper2);
+}
+footer {
+  padding: 55px clamp(24px, 7vw, 110px);
+  background: var(--paper2);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+footer p {
+  font: 18px var(--serif);
+}
+footer > a {
+  color: inherit;
+  font-size: 11px;
+}
+.reader {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  grid-template-columns: 340px 1fr;
+}
+.reader[open] {
+  display: grid;
+}
+.reader::backdrop {
+  background: var(--ink);
+}
+.reader-close {
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  border: 0;
+  background: transparent;
+  font: 32px var(--serif);
+  cursor: pointer;
+  z-index: 2;
+}
+.reader-meta {
+  background: var(--paper2);
+  padding: 90px 38px 40px;
+  overflow: auto;
+}
+.reader-meta h2 {
+  font: 700 37px/1.4 var(--serif);
+  margin: 0 0 8px;
+}
+.poet-link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--red);
+  font: 600 12px var(--kufi);
+  cursor: pointer;
+}
+.reader-meta dl {
+  margin: 55px 0 30px;
+}
+.reader-meta dl div {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding: 12px 0;
+}
+.reader-meta dt {
+  font-size: 9px;
+  color: var(--muted);
+}
+.reader-meta dd {
+  font: 16px var(--serif);
+  margin: 0;
+}
+.reader-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.reader-tools button {
+  border: 1px solid var(--line);
+  background: transparent;
+  padding: 8px 10px;
+}
+.rhythm {
+  margin-top: 40px;
+}
+.rhythm > span {
+  font-size: 9px;
+  color: var(--muted);
+}
+.rhythm > div {
+  height: 70px;
+  display: flex;
+  align-items: end;
+  gap: 3px;
+  margin-top: 12px;
+}
+.rhythm i {
+  display: block;
+  width: 4px;
+  background: var(--gold);
+  min-height: 5px;
+}
+.poem-sheet {
+  overflow: auto;
+  padding: 11vh 8vw;
+}
+.poem-lines {
+  font: clamp(24px, 2.2vw, 36px) / 2.2 var(--serif);
+  max-width: 950px;
+  margin: auto;
+}
+.poem-lines.vertical .verse {
+  display: grid;
+  grid-template-columns: 1fr 32px 1fr;
+  text-align: center;
+  border-bottom: 1px solid rgba(17, 16, 14, 0.06);
+  padding: 12px;
+}
+.poem-lines.vertical .verse i {
+  color: var(--gold);
+  font-style: normal;
+}
+.poem-lines.flowing {
+  max-width: 720px;
+}
+.poem-lines.flowing p {
+  margin: 0 0 1.3em;
+}
+.poem-sheet > a {
+  display: block;
+  text-align: center;
+  color: var(--muted);
+  font-size: 9px;
+  margin-top: 70px;
+}
+.search-panel,
+.settings {
+  width: min(720px, calc(100% - 32px));
+  border: 0;
+  background: var(--paper);
+  padding: 42px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+}
+.search-panel::backdrop,
+.settings::backdrop {
+  background: rgba(17, 16, 14, 0.85);
+  backdrop-filter: blur(8px);
+}
+.search-panel form button {
+  float: left;
+  border: 0;
+  background: none;
+  font-size: 30px;
+}
+.search-panel input,
+.settings input {
+  width: 100%;
+  border: 0;
+  border-bottom: 2px solid var(--ink);
+  background: transparent;
+  padding: 14px 0;
+  font: 28px var(--serif);
+  outline: none;
+}
+.search-results {
+  max-height: 55vh;
+  overflow: auto;
+  margin-top: 20px;
+}
+.search-result {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  text-align: right;
+  padding: 16px;
+  cursor: pointer;
+}
+.search-result b {
+  font: 20px var(--serif);
+}
+.search-result span {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+}
+.security-note {
+  font-size: 11px;
+  line-height: 2;
+  color: var(--muted);
+  background: var(--paper2);
+  padding: 14px;
+}
+.settings label {
+  display: block;
+  font-size: 10px;
+  margin-top: 22px;
+}
+.settings input {
+  font: 14px monospace;
+  direction: ltr;
+}
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 30px;
+}
+.settings .ghost {
+  color: var(--ink);
+  border-color: var(--line);
+}
+.api-console {
+  position: fixed;
+  bottom: 18px;
+  left: 18px;
+  z-index: 30;
+  background: var(--ink);
+  color: var(--paper);
+  width: 290px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+.api-console > button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 13px 16px;
+  display: flex;
+  justify-content: space-between;
+  font: 600 9px var(--kufi);
+  cursor: pointer;
+}
+.console-body {
+  display: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  grid-template-columns: 1fr 1fr;
+}
+.api-console.open .console-body {
+  display: grid;
+}
+.console-body div {
+  padding: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.console-body span {
+  display: block;
+  color: #8c857b;
+  font-size: 8px;
+}
+.console-body b,
+.console-body code {
+  font: 11px monospace;
+}
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 20px;
+  z-index: 120;
+  background: var(--red);
+  color: white;
+  padding: 12px 18px;
+  font-size: 11px;
+  transform: translateY(20px);
   opacity: 0;
-  transition: all 0.2s var(--ease);
+  transition: 0.25s;
+  pointer-events: none;
 }
-.verse-quote-btn:hover {
-  background: var(--sage);
-  color: #fff;
-}
-.verse-row:hover .verse-quote-btn {
+.toast.show {
+  transform: none;
   opacity: 1;
 }
-
-@media (max-width: 640px) {
-  .verse-row { grid-template-columns: 1fr; padding: 1rem 0; gap: 0.5rem; border-bottom: none; }
-  .verse-sadr, .verse-ajuz { text-align: center; }
-  .verse-num { display: none; }
-}
-
-/* ─── ZEN MODE ─── */
-body.zen-mode {
-  background: #FFFFFF; /* Pure white for maximum contrast in zen mode */
-}
-body.zen-mode .site-nav,
-body.zen-mode .site-footer,
-body.zen-mode .breadcrumb,
-body.zen-mode .hero,
-body.zen-mode .toolbar {
-  opacity: 0;
-  transform: translateY(-20px);
-  pointer-events: none;
-  position: absolute; /* Remove from flow to bring poem up */
-}
-body.zen-mode .reader-header {
+.empty {
+  grid-column: 1/-1;
+  padding: 70px;
   text-align: center;
-  margin-top: 2rem;
-  margin-bottom: 4rem;
+  color: var(--muted);
 }
-body.zen-mode .poem-author-line {
-  justify-content: center;
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 150px;
+  }
+  .hero-orbit {
+    width: min(80vw, 430px);
+    margin-top: 60px;
+  }
+  .filter-rail {
+    grid-template-columns: 1fr 1fr;
+  }
+  .filter-go {
+    min-height: 58px;
+  }
+  .poem-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .lab-grid,
+  .poet-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .reader[open] {
+    grid-template-columns: 1fr;
+  }
+  .reader-meta {
+    padding: 70px 24px 24px;
+  }
+  .reader-meta dl,
+  .rhythm {
+    display: none;
+  }
+  .poem-sheet {
+    padding: 50px 20px;
+  }
+  .reader-close {
+    color: var(--red);
+  }
 }
-body.zen-mode .verses-wrap {
-  max-width: 800px;
-  margin: 0 auto;
+@media (max-width: 560px) {
+  .topbar {
+    height: 70px;
+  }
+  .ghost kbd,
+  .ghost span,
+  .connection span {
+    display: none;
+  }
+  .hero {
+    min-height: 720px;
+    padding-inline: 22px;
+  }
+  .hero h1 {
+    font-size: 52px;
+  }
+  .hero-orbit {
+    width: 300px;
+  }
+  .section-header {
+    align-items: start;
+    flex-direction: column;
+  }
+  .experience,
+  .catalogue,
+  .laboratory {
+    padding: 75px 18px;
+  }
+  .filter-rail,
+  .poem-grid,
+  .lab-grid,
+  .poet-grid {
+    grid-template-columns: 1fr;
+  }
+  .filter-rail label {
+    border-bottom: 1px solid var(--line);
+  }
+  .lab-card {
+    min-height: 230px;
+  }
+  .poem-lines.vertical .verse {
+    grid-template-columns: 1fr;
+    text-align: right;
+  }
+  .poem-lines.vertical .verse i {
+    display: none;
+  }
+  .poem-lines {
+    font-size: 24px;
+    line-height: 2;
+  }
+  .api-console {
+    width: calc(100% - 36px);
+  }
+  footer {
+    align-items: start;
+    flex-direction: column;
+  }
 }
-body.zen-mode .verse-row { border-bottom: none; }
-body.zen-mode .verse-ajuz { color: var(--charcoal); } /* Make ajuz darker for reading */
-
-.exit-zen-btn {
-  position: fixed;
-  bottom: 2rem;
-  left: 2rem;
-  z-index: 100;
-  width: 50px; height: 50px;
-  border-radius: 50%;
-  background: var(--sage);
-  color: white;
-  border: none;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(74,93,78,0.3);
-  opacity: 0; pointer-events: none;
-  transform: scale(0.8);
-  transition: all 0.3s var(--ease);
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+  }
 }
-body.zen-mode .exit-zen-btn {
-  opacity: 1; pointer-events: auto; transform: scale(1);
-}
-.exit-zen-btn:hover { background: var(--terracotta); transform: scale(1.1); }
-
-/* ─── SKELETON ─── */
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-.skeleton {
-  background: var(--sand-dark);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  border-radius: 4px;
-}
-
-/* ─── MODALS ─── */
-.modal-backdrop {
-  position: fixed; inset: 0; z-index: 200;
-  background: rgba(251, 249, 246, 0.85);
-  backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center; padding: 1rem;
-}
-.modal-box {
-  background: #FFF;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(44,48,46,0.08);
-  width: 100%; max-height: 90vh; overflow-y: auto;
-}
-.modal-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
-}
-.modal-title { font-family: 'Reem Kufi', sans-serif; font-size: 1.1rem; font-weight: 700; }
-.modal-body { padding: 1.5rem; }
-
-/* ─── INPUTS ─── */
-.app-input {
-  width: 100%; background: var(--sand); border: 1px solid var(--border);
-  border-radius: 6px; padding: 10px 14px;
-  color: var(--charcoal); font-size: 0.85rem; font-family: 'Cairo', sans-serif; outline: none;
-  transition: all 0.2s;
-}
-.app-input:focus { border-color: var(--sage); background: #FFF; }
-
-/* ─── ERROR ─── */
-.error-box { text-align: center; padding: 3rem 1rem; color: var(--charcoal-light); }
-.error-icon { color: var(--terracotta); margin-bottom: 1rem; }
-
-/* ─── TOAST ─── */
-.toast {
-  display: flex; align-items: center; gap: 8px;
-  padding: 12px 16px; border-radius: 8px;
-  font-size: 0.85rem; font-weight: 600;
-  background: #FFF; border: 1px solid var(--border);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  pointer-events: auto;
-  transition: all 0.3s var(--ease);
-}
-
-/* ─── FOOTER ─── */
-.site-footer {
-  border-top: 1px solid var(--border);
-  padding: 2rem 1.5rem;
-  font-size: 0.8rem; color: var(--charcoal-light);
-  transition: opacity 0.4s;
-}
-.footer-inner {
-  max-width: 1000px; margin: 0 auto;
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;
-}
-.footer-inner a { color: var(--sage); text-decoration: none; font-weight: 600; }
-.footer-inner a:hover { color: var(--terracotta); }
-
-.hidden { display: none !important; }
