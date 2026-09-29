@@ -117,6 +117,12 @@ class Mishkat {
         e.preventDefault();
         this.openSearch();
       }
+      
+      // Keyboard navigation for explorer (Right/Left arrows)
+      if ($("[data-reader]").hasAttribute("open")) {
+        if (e.key === "ArrowRight") $("[data-reader-prev]").click();
+        if (e.key === "ArrowLeft") $("[data-reader-next]").click();
+      }
     });
     $("[data-search-input]").oninput = (e) => {
       clearTimeout(this.searchTimer);
