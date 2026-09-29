@@ -401,8 +401,34 @@ class Mishkat {
       this.renderText();
       this.renderRhythm();
       $("[data-reader]").showModal();
+      this.loadRecitation(p.id);
     } catch (e) {
       this.toast(e.message);
+    }
+  }
+  async loadRecitation(poemId) {
+    const box = $("[data-recitation]");
+    box.hidden = true;
+    $("[data-recitation-player]").innerHTML = "";
+    try {
+      const { data } = await this.api.get(
+        `/private/poems/${poemId}/recitation`,
+        { cache: false },
+      );
+      if (!data?.available || this.state.poem?.id !== Number(poemId)) return;
+      $("[data-recitation-image]").src = data.thumbnail_url || "";
+      $("[data-recitation-image]").alt = data.title || "إلقاء القصيدة";
+      $("[data-recitation-title]").textContent = data.title || "إلقاء القصيدة";
+      $("[data-recitation-channel]").textContent = data.channel || "YouTube";
+      $("[data-recitation-link]").href = data.watch_url;
+      $("[data-recitation-play]").onclick = () => {
+        $("[data-recitation-player]").innerHTML = `<iframe src="${esc(data.embed_url)}?autoplay=1&playsinline=1" title="${esc(data.title || "إلقاء القصيدة")}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+        $("[data-recitation-play]").hidden = true;
+      };
+      $("[data-recitation-play]").hidden = false;
+      box.hidden = false;
+    } catch (_) {
+      box.hidden = true;
     }
   }
   renderText() {
