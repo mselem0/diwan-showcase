@@ -6,8 +6,8 @@
   --red: #8c2e25;
   --muted: #766f64;
   --line: rgba(17, 16, 14, 0.14);
-  --serif: "Amiri", serif;
-  --kufi: "Noto Kufi Arabic", sans-serif;
+  --serif: "Noto Naskh Arabic", "Tahoma", serif;
+  --kufi: "Alexandria", "Tahoma", sans-serif;
 }
 * {
   box-sizing: border-box;
@@ -21,6 +21,8 @@ body {
   color: var(--ink);
   font-family: var(--kufi);
   overflow-x: hidden;
+  font-weight: 500;
+  text-rendering: optimizeLegibility;
 }
 .grain {
   position: fixed;
@@ -66,8 +68,8 @@ body {
   font-size: 15px;
 }
 .brand small {
-  font-size: 9px;
-  opacity: 0.65;
+  font-size: 10px;
+  opacity: 0.78;
   margin-top: 3px;
 }
 .top-actions {
@@ -136,26 +138,27 @@ body.connected .api-console i {
   bottom: -150px;
 }
 .eyebrow {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.22em;
   color: var(--gold);
   font-weight: 700;
   margin: 0 0 18px;
 }
 .hero h1 {
-  font: 400 clamp(54px, 7vw, 104px) / 1.06 var(--serif);
+  font: 600 clamp(52px, 6vw, 84px) / 1.2 var(--serif);
   margin: 0;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
 }
 .hero h1 em {
   color: var(--gold);
-  font-weight: 400;
+  font-weight: 600;
 }
 .hero-lead {
   max-width: 620px;
   color: #bdb5a8;
   line-height: 2;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 500;
   margin: 34px 0;
 }
 .hero-actions {
@@ -287,13 +290,13 @@ body.connected .api-console i {
   margin-bottom: 44px;
 }
 .section-header h2 {
-  font: 400 clamp(38px, 5vw, 68px) / 1.2 var(--serif);
+  font: 600 clamp(38px, 5vw, 68px) / 1.35 var(--serif);
   margin: 0;
 }
 .section-header > p {
   max-width: 420px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 2;
 }
 .filter-rail {
@@ -307,7 +310,7 @@ body.connected .api-console i {
 }
 .filter-rail label span {
   display: block;
-  font-size: 9px;
+  font-size: 10px;
   color: var(--muted);
   margin-bottom: 8px;
 }
@@ -315,7 +318,7 @@ body.connected .api-console i {
   width: 100%;
   border: 0;
   background: transparent;
-  font: 600 12px var(--kufi);
+  font: 600 13px var(--kufi);
   outline: none;
 }
 .filter-go {
@@ -377,11 +380,11 @@ body.connected .api-console i {
   color: var(--gold);
 }
 .poem-card h3 {
-  font: 700 25px/1.5 var(--serif);
+  font: 700 27px/1.65 var(--serif);
   margin: 24px 0 10px;
 }
 .poem-card blockquote {
-  font: 18px/1.8 var(--serif);
+  font: 500 20px/1.9 var(--serif);
   color: var(--muted);
   margin: 0;
   display: -webkit-box;
@@ -452,11 +455,11 @@ body.connected .api-console i {
   color: var(--red);
 }
 .lab-card b {
-  font: 28px var(--serif);
+  font: 700 29px/1.5 var(--serif);
   margin: 50px 0 14px;
 }
 .lab-card p {
-  font-size: 11px;
+  font-size: 13px;
   color: #9b9286;
   line-height: 2;
 }
@@ -503,7 +506,7 @@ body.connected .api-console i {
   cursor: pointer;
 }
 .poet-card b {
-  font: 700 24px var(--serif);
+  font: 700 26px/1.5 var(--serif);
 }
 .poet-card span {
   display: block;
@@ -564,7 +567,7 @@ footer > a {
   overflow: auto;
 }
 .reader-meta h2 {
-  font: 700 37px/1.4 var(--serif);
+  font: 700 39px/1.55 var(--serif);
   margin: 0 0 8px;
 }
 .poet-link {
@@ -627,7 +630,7 @@ footer > a {
   padding: 11vh 8vw;
 }
 .poem-lines {
-  font: clamp(24px, 2.2vw, 36px) / 2.2 var(--serif);
+  font: 600 clamp(26px, 2.3vw, 38px) / 2.15 var(--serif);
   max-width: 950px;
   margin: auto;
 }
@@ -886,7 +889,7 @@ footer > a {
     display: none;
   }
   .poem-lines {
-    font-size: 24px;
+    font-size: 27px;
     line-height: 2;
   }
   .api-console {
