@@ -117,8 +117,6 @@ class Mishkat {
         e.preventDefault();
         this.openSearch();
       }
-      if (e.key === "Escape" && $("[data-reader]").open)
-        $("[data-reader]").close();
     });
     $("[data-search-input]").oninput = (e) => {
       clearTimeout(this.searchTimer);
@@ -259,6 +257,8 @@ class Mishkat {
         this.loadPoets(),
         this.loadStats(),
       ]);
+      // الدخول مباشرة إلى المستكشف عند تحميل الصفحة
+      this.surprise();
     } catch (e) {
       this.offline(e.message);
     }
