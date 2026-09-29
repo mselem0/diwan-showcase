@@ -95,6 +95,8 @@ class Mishkat {
       poem: null,
       diacritics: true,
       font: 1,
+      readerPage: 1,
+      readerLastPage: 1,
     };
     this.searchTimer = null;
     this.bind();
@@ -162,6 +164,24 @@ class Mishkat {
     $("[data-font-down]").onclick = () => this.font(-0.1);
     $("[data-toggle-diacritics]").onclick = () => this.toggleDiacritics();
     $("[data-copy]").onclick = () => this.copyPoem();
+    $("[data-reader-apply]").onclick = () => {
+      this.state.readerPage = 1;
+      this.loadReaderResults();
+    };
+    $("[data-reader-search]").oninput = () => {
+      clearTimeout(this.readerSearchTimer);
+      this.readerSearchTimer = setTimeout(() => {
+        this.state.readerPage = 1;
+        this.loadReaderResults();
+      }, 320);
+    };
+    $("[data-reader-prev]").onclick = () => {
+      if (this.state.readerPage > 1) { this.state.readerPage--; this.loadReaderResults(); }
+    };
+    $("[data-reader-next]").onclick = () => {
+      if (this.state.readerPage < this.state.readerLastPage) { this.state.readerPage++; this.loadReaderResults(); }
+    };
+    $("[data-reader-surprise]").onclick = () => this.surprise();
     $("[data-console-toggle]").onclick = () =>
       $("[data-api-console]").classList.toggle("open");
   }
@@ -269,6 +289,10 @@ class Mishkat {
       "letter",
       "letter",
     );
+    this.fillSelect("[data-reader-filter-era]", this.eras, "id", "name");
+    this.fillSelect("[data-reader-filter-meter]", meters.data || [], "name", "name");
+    this.fillSelect("[data-reader-filter-theme]", themes.data || [], "name", "name");
+    this.fillSelect("[data-reader-filter-rhyme]", rhymes.data || [], "letter", "letter");
     this.renderEras();
   }
   fillSelect(selector, items, value, label) {
@@ -379,7 +403,7 @@ class Mishkat {
       this.toast(e.message);
     }
   }
-  async openPoem(id) {
+  async openPoem(id, refreshWorkspace = true) {
     try {
       const { data: p } = await this.api.get(`/poems/${id}`);
       this.state.poem = p;
@@ -400,10 +424,62 @@ class Mishkat {
       a.textContent = p.attribution?.text || "المصدر: الديوان";
       this.renderText();
       this.renderRhythm();
-      $("[data-reader]").showModal();
+      const reader = $("[data-reader]");
+      if (!reader.open) reader.showModal();
+      $(".poem-sheet").scrollTo({ top: 0, behavior: "smooth" });
       this.loadRecitation(p.id);
+      if (refreshWorkspace) {
+        this.syncReaderFilters();
+        this.loadReaderResults();
+      }
     } catch (e) {
       this.toast(e.message);
+    }
+  }
+  syncReaderFilters() {
+    ["style", "era", "meter", "theme", "rhyme"].forEach((name) => {
+      $("[data-reader-filter-" + name + "]").value = $("[data-filter-" + name + "]").value;
+    });
+  }
+  readerQuery() {
+    const pairs = {
+      poem_style: $("[data-reader-filter-style]").value,
+      era_id: $("[data-reader-filter-era]").value,
+      meter: $("[data-reader-filter-meter]").value,
+      theme: $("[data-reader-filter-theme]").value,
+      rhyme: $("[data-reader-filter-rhyme]").value,
+      page: this.state.readerPage,
+      per_page: 8,
+    };
+    return new URLSearchParams(Object.entries(pairs).filter(([, value]) => value !== "")).toString();
+  }
+  async loadReaderResults() {
+    const grid = $("[data-reader-results]");
+    const q = $("[data-reader-search]").value.trim();
+    grid.innerHTML = '<i class="reader-result-loading"></i>'.repeat(4);
+    try {
+      let items, meta;
+      if (q.length >= 2) {
+        const response = await this.api.get(`/search?q=${encodeURIComponent(q)}&type=poems&per_page=20`, { cache: false });
+        items = response.data?.poems || [];
+        meta = { current_page: 1, last_page: 1 };
+      } else {
+        const response = await this.api.get("/poems?" + this.readerQuery(), { cache: false });
+        items = response.data || [];
+        meta = response.meta || {};
+      }
+      this.state.readerLastPage = meta.last_page || 1;
+      $("[data-reader-page]").textContent = `${meta.current_page || 1} / ${this.state.readerLastPage}`;
+      if (!items.length) {
+        grid.innerHTML = "<p>لا توجد نتائج لهذا المسار.</p>";
+        return;
+      }
+      grid.innerHTML = items.map((poem) => `<button data-reader-poem="${poem.id}"><span>${this.styleName(poem.poem_style)}</span><b>${esc(poem.title)}</b><small>${esc(poem.poet?.name || "")}</small></button>`).join("");
+      $$('[data-reader-poem]', grid).forEach((button) => {
+        button.onclick = () => this.openPoem(button.dataset.readerPoem, false);
+      });
+    } catch (error) {
+      grid.innerHTML = `<p>${esc(error.message)}</p>`;
     }
   }
   async loadRecitation(poemId) {

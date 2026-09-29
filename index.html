@@ -183,6 +183,22 @@
         </div>
       </aside>
       <article class="poem-sheet">
+        <section class="reader-workspace">
+          <div class="reader-workspace-head">
+            <div><span>المستكشف الحي</span><strong>غيّر مسارك دون مغادرة القصيدة</strong></div>
+            <div class="reader-navigation"><button data-reader-prev aria-label="النتائج السابقة">→</button><span data-reader-page>1</span><button data-reader-next aria-label="النتائج التالية">←</button></div>
+          </div>
+          <div class="reader-search-row"><input data-reader-search placeholder="ابحث عن قصيدة…" autocomplete="off" /><button data-reader-surprise type="button">فاجئني ✦</button></div>
+          <div class="reader-filters">
+            <label><span>النمط</span><select data-reader-filter-style><option value="">الكل</option><option value="vertical">عمودي</option><option value="prose">نثري</option><option value="free_verse">تفعيلة</option></select></label>
+            <label><span>العصر</span><select data-reader-filter-era><option value="">كل العصور</option></select></label>
+            <label><span>البحر</span><select data-reader-filter-meter><option value="">كل البحور</option></select></label>
+            <label><span>الغرض</span><select data-reader-filter-theme><option value="">كل الأغراض</option></select></label>
+            <label><span>القافية</span><select data-reader-filter-rhyme><option value="">كل القوافي</option></select></label>
+            <button data-reader-apply type="button">تحديث</button>
+          </div>
+          <div class="reader-results" data-reader-results></div>
+        </section>
         <section class="recitation" data-recitation hidden>
           <div class="recitation-visual">
             <img data-recitation-image alt="" />
