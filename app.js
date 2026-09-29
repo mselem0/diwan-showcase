@@ -334,7 +334,7 @@ class Mishkat {
     const placeholder = $('[data-player-placeholder]');
     const fallback = $('[data-player-fallback]');
 
-    // Reset player — show loading
+    // Reset — show loading state
     frame.hidden = true;
     fallback.hidden = true;
     placeholder.hidden = false;
@@ -344,59 +344,52 @@ class Mishkat {
         <span>جاري البحث عن إلقاء…</span>
       </div>`;
 
+    // Build YouTube search query (fallback always available)
+    const poem = this.state.poem;
+    const ytSearchQuery = encodeURIComponent(
+      `${undiacritize(poem.title)} ${undiacritize(poem.poet?.name || '')} إلقاء قصيدة`
+    );
+    const ytSearchEmbed = `https://www.youtube.com/embed?listType=search&list=${ytSearchQuery}&rel=0`;
+
+    const showYouTubeSearch = () => {
+      placeholder.hidden = true;
+      fallback.hidden = true;
+      frame.innerHTML = `<iframe
+        src="${ytSearchEmbed}"
+        title="نتائج إلقاء: ${esc(poem.title)}"
+        allow="encrypted-media; picture-in-picture"
+        allowfullscreen
+        referrerpolicy="strict-origin-when-cross-origin">
+      </iframe>`;
+      frame.hidden = false;
+    };
+
     try {
       const { data } = await this.api.get(
         `/private/poems/${poemId}/recitation`,
         { cache: false }
       );
 
-      // Guard: user may have switched poems
       if (this.state.poem?.id !== Number(poemId)) return;
 
       if (data?.available) {
-        // ✅ Recitation found — embed YouTube player
+        // ✅ Cached matched recitation — embed directly (autoplay)
         placeholder.hidden = true;
         fallback.hidden = true;
-        frame.innerHTML = `
-          <iframe
-            src="${esc(data.embed_url)}?rel=0&modestbranding=1&playsinline=1"
-            title="${esc(data.title || 'إلقاء القصيدة')}"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowfullscreen
-            referrerpolicy="strict-origin-when-cross-origin">
-          </iframe>`;
+        frame.innerHTML = `<iframe
+          src="${esc(data.embed_url)}?rel=0&modestbranding=1&playsinline=1"
+          title="${esc(data.title || 'إلقاء القصيدة')}"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin">
+        </iframe>`;
         frame.hidden = false;
       } else {
-        // ❌ No recitation — offer YouTube search
-        placeholder.hidden = true;
-        frame.hidden = true;
-        const poem = this.state.poem;
-        const ytQuery = encodeURIComponent(
-          `${undiacritize(poem.title)} ${poem.poet?.name || ''} إلقاء`
-        );
-        fallback.innerHTML = `
-          <div class="no-recitation">
-            <i>🎙️</i>
-            <p>لا يوجد إلقاء مُفهرَس لهذه القصيدة حتى الآن.</p>
-            <a
-              href="https://www.youtube.com/results?search_query=${ytQuery}"
-              target="_blank"
-              rel="noopener"
-              class="yt-search-btn">
-              ابحث عنها على YouTube ↗
-            </a>
-          </div>`;
-        fallback.hidden = false;
+        // ❌ No cached recitation — embed YouTube search directly
+        showYouTubeSearch();
       }
     } catch (_) {
-      placeholder.hidden = true;
-      frame.hidden = true;
-      fallback.innerHTML = `
-        <div class="no-recitation">
-          <i>⚠️</i>
-          <p>تعذّر جلب الإلقاء. تحقق من الاتصال.</p>
-        </div>`;
-      fallback.hidden = false;
+      if (this.state.poem?.id === Number(poemId)) showYouTubeSearch();
     }
   }
 
