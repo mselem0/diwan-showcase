@@ -3,16 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#11100e" />
-    <meta
-      name="description"
-      content="مختبر حي لاستكشاف الشعر العربي عبر واجهة الديوان البرمجية"
-    />
+    <meta name="theme-color" content="#0f0f0f" />
+    <meta name="description" content="محرك إلقاء الشعر العربي — ابحث عن قصيدة واستمع إلى إلقائها مباشرةً" />
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2311100e'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='40' fill='%23b58a3b'%3Eم%3C/text%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230f0f0f'/%3E%3Ccircle cx='32' cy='32' r='22' fill='%23cc2200'/%3E%3Cpolygon points='26,22 26,42 46,32' fill='white'/%3E%3C/svg%3E"
     />
-    <title>مِشكاة — مختبر الشعر العربي</title>
+    <title>مِشكاة — محرك إلقاء الشعر العربي</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,255 +19,177 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="grain" aria-hidden="true"></div>
+    <!-- ═══ TOPBAR ═══ -->
     <header class="topbar">
-      <a class="brand" href="#" data-home
-        ><span class="brand-mark"><img src="assets/mishkat-logo.png" alt="" /></span
-        ><span><b>مِشكاة</b><small>مختبر الديوان الشعري</small></span></a
-      >
-      <nav class="top-actions">
-        <button class="ghost" data-open-search>
-          ⌕ <span>ابحث</span><kbd>⌘ K</kbd></button
-        ><button class="connection" data-open-settings>
-          <i></i><span data-status>غير متصل</span>
+      <div class="brand">
+        <svg class="brand-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="18" cy="18" r="18" fill="#cc2200"/>
+          <polygon points="14,11 14,25 27,18" fill="white"/>
+        </svg>
+        <div class="brand-text">
+          <b>مِشكاة</b>
+          <small>محرك إلقاء الشعر العربي</small>
+        </div>
+      </div>
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M13 13l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="search"
+          data-search
+          placeholder="ابحث عن قصيدة أو شاعر…"
+          autocomplete="off"
+          aria-label="البحث في الديوان"
+        />
+        <kbd>⌘K</kbd>
+      </div>
+      <nav class="topbar-actions">
+        <button class="connection-btn" data-open-settings>
+          <i class="conn-dot"></i>
+          <span data-status>غير متصل</span>
         </button>
       </nav>
     </header>
-    <main>
-      <section class="experience" id="explorer">
-        <div class="explorer-stage" data-mascot-stage>
-          <div class="explorer-copy">
-            <p class="eyebrow">مستكشف الشعر العربي · بيانات حيّة</p>
-            <h1>قصيدتك التالية<br /><em>تبدأ من هنا.</em></h1>
-            <p>اختر إحساسًا أو عصرًا أو قافية، أو دع شاعرنا يقودك إلى قصيدة بالمصادفة.</p>
-            <div class="live-stats"><span><b data-stat-poems>—</b> قصيدة</span><span><b data-stat-poets>—</b> شاعرًا</span><span><b data-stat-eras>—</b> عصرًا</span></div>
-          </div>
-          <div class="mascot-wrap" data-mascot>
-            <div class="speech-bubble" data-speech><span></span><i></i></div>
-            <img src="assets/poet-mascot.png" alt="شخصية شاعر مِشكاة التفاعلية" />
-            <button class="mascot-action" data-surprise>اختر لي قصيدة ✦</button>
-          </div>
-        </div>
-        <header class="explorer-title"><div><p class="eyebrow">اصنع مسارك</p><h2>ابدأ من إحساس، لا من فهرس.</h2></div><p>كل اختيار يرسل طلبًا حقيقيًا إلى API ويعيد تشكيل النتائج أمامك.</p></header>
-        <div class="filter-rail">
-          <label
-            ><span>النمط</span
-            ><select data-filter-style>
-              <option value="">كل الأنماط</option>
-              <option value="vertical">عمودي</option>
-              <option value="prose">نثري</option>
-              <option value="free_verse">تفعيلة</option>
-            </select></label
-          ><label
-            ><span>العصر</span
-            ><select data-filter-era>
-              <option value="">كل العصور</option>
-            </select></label
-          ><label
-            ><span>البحر</span
-            ><select data-filter-meter>
-              <option value="">كل البحور</option>
-            </select></label
-          ><label
-            ><span>الغرض</span
-            ><select data-filter-theme>
-              <option value="">كل الأغراض</option>
-            </select></label
-          ><label
-            ><span>القافية</span
-            ><select data-filter-rhyme>
-              <option value="">كل القوافي</option>
-            </select></label
-          ><button class="filter-go" data-apply-filters>استكشف</button>
-        </div>
-        <div class="results-head">
-          <p data-results-summary>اختر ما يلهمك ثم ابدأ.</p>
-          <div>
-            <button class="icon-button" data-prev aria-label="السابق">→</button
-            ><span data-page>1</span
-            ><button class="icon-button" data-next aria-label="التالي">
-              ←
-            </button>
-          </div>
-        </div>
-        <div class="poem-grid" data-poem-grid></div>
-      </section>
-      <section class="laboratory">
-        <header class="section-header light">
-          <div>
-            <p class="eyebrow">أفكار تتجاوز الفهرسة</p>
-            <h2>أربع نوافذ جديدة على القصيدة.</h2>
-          </div>
-        </header>
-        <div class="lab-grid">
-          <button class="lab-card" data-lab="surprise">
-            <span>01</span><b>باب المصادفة</b>
-            <p>قصيدة عشوائية من قلب المكتبة، بلا تحيز للأشهر.</p>
-            <i>جرّب الآن ↙</i></button
-          ><button class="lab-card" data-lab="constellation">
-            <span>02</span><b>كوكبة شاعر</b>
-            <p>اختر شاعرًا وشاهد قصائده موزعة حسب البحر والغرض والنمط.</p>
-            <i>ابنِ الكوكبة ↙</i></button
-          ><button class="lab-card" data-lab="rhythm">
-            <span>03</span><b>بصمة الإيقاع</b>
-            <p>تحويل أطوال الأشطر والأسطر إلى أثر بصري خاص بكل قصيدة.</p>
-            <i>افتح قصيدة ↙</i></button
-          ><button class="lab-card" data-lab="thread">
-            <span>04</span><b>خيط القافية</b>
-            <p>انتقل بين العصور عبر قصائد تشترك في الحرف الأخير.</p>
-            <i>اختر قافية ↙</i>
-          </button>
-        </div>
-      </section>
-      <section class="catalogue" id="poets">
-        <header class="section-header">
-          <div>
-            <p class="eyebrow">أصوات عبر الزمن</p>
-            <h2>الشعراء والعصور.</h2>
-          </div>
-          <button class="text-button" data-load-more-poets>
-            المزيد من الشعراء
-          </button>
-        </header>
-        <div class="era-strip" data-era-strip></div>
-        <div class="poet-grid" data-poet-grid></div>
-      </section>
-    </main>
-    <footer class="site-footer">
-      <div class="brand">
-        <span class="brand-mark"><img src="assets/mishkat-logo.png" alt="" /></span
-        ><span><b>مِشكاة</b><small>تجربة مبنية على AlDiwan API</small></span>
+
+    <!-- ═══ FILTERS BAR ═══ -->
+    <div class="filters-bar">
+      <label class="filter-label">
+        <span>النمط</span>
+        <select data-filter-style>
+          <option value="">الكل</option>
+          <option value="vertical">عمودي</option>
+          <option value="prose">نثري</option>
+          <option value="free_verse">تفعيلة</option>
+        </select>
+      </label>
+      <label class="filter-label">
+        <span>العصر</span>
+        <select data-filter-era>
+          <option value="">الكل</option>
+        </select>
+      </label>
+      <label class="filter-label">
+        <span>البحر</span>
+        <select data-filter-meter>
+          <option value="">الكل</option>
+        </select>
+      </label>
+      <div class="pagination">
+        <button class="pag-btn" data-prev aria-label="الصفحة السابقة">→</button>
+        <span data-page class="pag-label">1</span>
+        <button class="pag-btn" data-next aria-label="الصفحة التالية">←</button>
       </div>
-      <p>ما يمكن أن تبنيه القصيدة حين تصبح بيانات حيّة.</p>
-      <a href="https://developers.aldiwan.net" target="_blank" rel="noopener"
-        >وثائق المطورين ↗</a
-      >
-    </footer>
-    <dialog class="reader" data-reader>
-      <aside class="reader-meta">
-        <p class="eyebrow" data-reader-style></p>
-        <h2 data-reader-title></h2>
-        <button class="poet-link" data-reader-poet></button>
-        <dl>
-          <div>
-            <dt>العصر</dt>
-            <dd data-reader-era>—</dd>
+    </div>
+
+    <!-- ═══ APP SHELL ═══ -->
+    <div class="app-shell">
+
+      <!-- Results Panel -->
+      <aside class="results-panel" aria-label="نتائج البحث">
+        <div class="results-list" data-results-list>
+          <div class="initial-state">
+            <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+              <circle cx="24" cy="24" r="24" fill="#1a1a1a"/>
+              <circle cx="24" cy="24" r="15" fill="#cc2200"/>
+              <polygon points="19,16 19,32 34,24" fill="white"/>
+            </svg>
+            <p>ابحث عن قصيدة أو شاعر<br/>للاستماع إلى إلقائها</p>
           </div>
-          <div>
-            <dt>البحر</dt>
-            <dd data-reader-meter>—</dd>
-          </div>
-          <div>
-            <dt>الغرض</dt>
-            <dd data-reader-theme>—</dd>
-          </div>
-          <div>
-            <dt>القافية</dt>
-            <dd data-reader-rhyme>—</dd>
-          </div>
-        </dl>
-        <div class="reader-tools">
-          <button data-font-down>أ−</button><button data-font-up>أ+</button
-          ><button data-toggle-diacritics>بلا تشكيل</button
-          ><button data-copy>نسخ</button>
-        </div>
-        <div class="rhythm">
-          <span>بصمة الإيقاع</span>
-          <div data-rhythm></div>
         </div>
       </aside>
-      <article class="poem-sheet">
-        <section class="reader-workspace">
-          <div class="reader-workspace-head">
-            <div><span>المستكشف الحي</span><strong>غيّر مسارك دون مغادرة القصيدة</strong></div>
-            <div class="reader-navigation"><button data-reader-prev aria-label="النتائج السابقة">→</button><span data-reader-page>1</span><button data-reader-next aria-label="النتائج التالية">←</button></div>
-          </div>
-          <div class="reader-search-row"><input data-reader-search placeholder="ابحث عن قصيدة…" autocomplete="off" /><button data-reader-surprise type="button">فاجئني ✦</button></div>
-          <div class="reader-filters">
-            <label><span>النمط</span><select data-reader-filter-style><option value="">الكل</option><option value="vertical">عمودي</option><option value="prose">نثري</option><option value="free_verse">تفعيلة</option></select></label>
-            <label><span>العصر</span><select data-reader-filter-era><option value="">كل العصور</option></select></label>
-            <label><span>البحر</span><select data-reader-filter-meter><option value="">كل البحور</option></select></label>
-            <label><span>الغرض</span><select data-reader-filter-theme><option value="">كل الأغراض</option></select></label>
-            <label><span>القافية</span><select data-reader-filter-rhyme><option value="">كل القوافي</option></select></label>
-            <button data-reader-apply type="button">تحديث</button>
-          </div>
-          <div class="reader-results" data-reader-results></div>
-        </section>
-        <section class="recitation" data-recitation hidden>
-          <div class="recitation-visual">
-            <img data-recitation-image alt="" />
-            <span class="recitation-glow"></span>
-            <button class="recitation-play" data-recitation-play type="button" aria-label="تشغيل الإلقاء">
-              <i aria-hidden="true">▶</i>
-            </button>
-          </div>
-          <div class="recitation-copy">
-            <span class="recitation-kicker">استمع إلى القصيدة · YouTube</span>
-            <strong data-recitation-title></strong>
-            <small data-recitation-channel></small>
-            <div class="recitation-wave" aria-hidden="true">
-              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-            </div>
-            <div class="recitation-actions">
-              <button data-recitation-play-secondary type="button">تشغيل الإلقاء</button>
-              <a data-recitation-link target="_blank" rel="noopener">فتح في YouTube ↗</a>
+
+      <!-- Viewer Panel -->
+      <section class="viewer-panel" aria-label="مشغّل القصيدة">
+
+        <!-- Player Zone -->
+        <div class="player-zone">
+          <div class="player-placeholder" data-player-placeholder>
+            <div class="placeholder-inner">
+              <svg viewBox="0 0 80 80" fill="none" aria-hidden="true">
+                <circle cx="40" cy="40" r="40" fill="#1a1a1a"/>
+                <circle cx="40" cy="40" r="28" fill="#cc2200" opacity="0.15"/>
+                <circle cx="40" cy="40" r="20" fill="#cc2200" opacity="0.3"/>
+                <polygon points="34,30 34,50 54,40" fill="#cc2200"/>
+              </svg>
+              <p>اختر قصيدة من القائمة لتشغيل إلقائها</p>
             </div>
           </div>
-          <div class="recitation-player" data-recitation-player></div>
-        </section>
-        <div class="poem-lines" data-poem-lines></div>
-        <a data-attribution target="_blank" rel="noopener"></a>
-      </article>
-    </dialog>
-    <dialog class="search-panel" data-search-dialog>
-      <form method="dialog"><button>×</button></form>
-      <p class="eyebrow">البحث في الديوان</p>
-      <input
-        data-search-input
-        placeholder="اسم شاعر أو قصيدة…"
-        autocomplete="off"
-      />
-      <div data-search-results class="search-results">
-        <p>اكتب حرفين على الأقل.</p>
+          <div class="player-frame" data-player-frame hidden></div>
+          <div class="player-fallback" data-player-fallback hidden></div>
+        </div>
+
+        <!-- Poem Content -->
+        <div class="poem-content" data-poem-view hidden>
+          <header class="poem-header">
+            <div class="poem-style-badge" data-poem-style-badge></div>
+            <h1 class="poem-title" data-poem-title></h1>
+            <div class="poem-byline">
+              <span class="poem-poet" data-poem-poet></span>
+              <span class="byline-dot" aria-hidden="true">·</span>
+              <span data-poem-era></span>
+              <span class="byline-dot" aria-hidden="true">·</span>
+              <span data-poem-meter></span>
+            </div>
+          </header>
+          <div class="poem-tools" role="toolbar" aria-label="أدوات القراءة">
+            <button data-font-down title="تصغير الخط">أ−</button>
+            <button data-font-up title="تكبير الخط">أ+</button>
+            <button data-toggle-diacritics>بلا تشكيل</button>
+            <button data-copy>نسخ ◎</button>
+          </div>
+          <div class="poem-lines" data-poem-lines></div>
+          <a class="attribution" data-attribution target="_blank" rel="noopener"></a>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- ═══ SETTINGS DIALOG ═══ -->
+    <dialog class="settings-dialog" data-settings>
+      <form method="dialog"><button class="dialog-close" aria-label="إغلاق">×</button></form>
+      <div class="dialog-icon">
+        <svg viewBox="0 0 36 36" fill="none">
+          <circle cx="18" cy="18" r="18" fill="#cc2200"/>
+          <polygon points="14,11 14,25 27,18" fill="white"/>
+        </svg>
       </div>
-    </dialog>
-    <dialog class="settings" data-settings>
-      <form method="dialog"><button class="reader-close">×</button></form>
-      <p class="eyebrow">اتصال API</p>
-      <h2>مفتاح مؤقت لهذه الجلسة</h2>
-      <p class="security-note">
-        هذه صفحة عامة؛ استخدم مفتاح اختبار مقيّدًا بالنطاق
-        <code>https://mselem0.github.io</code>. لا يُحفظ المفتاح في المستودع أو
-        التخزين الدائم.
+      <h2>مِشكاة API</h2>
+      <p class="dialog-note">
+        هذه صفحة عامة. استخدم مفتاح اختبار مقيّدًا بالنطاق
+        <code>https://mselem0.github.io</code>.
       </p>
-      <label
-        >Base URL<input
-          data-base-url
-          dir="ltr"
-          value="https://api.aldiwan.net/api/v1" /></label
-      ><label
-        >API key<input
-          data-api-key
-          dir="ltr"
-          type="password"
-          autocomplete="off"
-          placeholder="aldiwan_test_…"
-      /></label>
+      <label class="dialog-field">
+        Base URL
+        <input data-base-url dir="ltr" value="https://api.aldiwan.net/api/v1" />
+      </label>
+      <label class="dialog-field">
+        API Key
+        <input data-api-key dir="ltr" type="password" autocomplete="off" placeholder="aldiwan_test_…" />
+      </label>
       <div class="dialog-actions">
-        <button class="primary" data-connect>اتصل واختبر</button
-        ><button class="ghost" data-disconnect>قطع الاتصال</button>
+        <button class="btn-primary" data-connect>اتصل واختبر</button>
+        <button class="btn-ghost" data-disconnect>قطع الاتصال</button>
       </div>
     </dialog>
+
+    <!-- ═══ API CONSOLE ═══ -->
     <aside class="api-console" data-api-console>
-      <button data-console-toggle><span>API LIVE CONSOLE</span><i></i></button>
+      <button class="console-toggle" data-console-toggle>
+        <span>API LIVE CONSOLE</span><i>▸</i>
+      </button>
       <div class="console-body">
-        <div><span>آخر طلب</span><code data-console-endpoint>—</code></div>
+        <div><span>الطلب</span><code data-console-endpoint>—</code></div>
         <div><span>الحالة</span><b data-console-code>—</b></div>
-        <div><span>الزمن</span><b data-console-time>—</b></div>
+        <div><span>الوقت</span><b data-console-time>—</b></div>
         <div><span>المتبقي</span><b data-console-remaining>—</b></div>
       </div>
     </aside>
-    <div class="toast" data-toast></div>
+
+    <!-- ═══ TOAST ═══ -->
+    <div class="toast" data-toast role="status" aria-live="polite"></div>
+
     <script src="app.js"></script>
   </body>
 </html>
