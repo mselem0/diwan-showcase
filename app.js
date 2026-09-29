@@ -385,8 +385,20 @@ class Mishkat {
         </iframe>`;
         frame.hidden = false;
       } else {
-        // ❌ No cached recitation — embed YouTube search directly
-        showYouTubeSearch();
+        // ❌ No cached recitation — embed elegant fallback UI
+        placeholder.hidden = true;
+        frame.hidden = true;
+        const watchUrl = data?.watch_url || `https://www.youtube.com/results?search_query=${encodeURIComponent(poem.title + ' ' + (poem.poet?.name || ''))}`;
+        fallback.innerHTML = `
+          <div class="no-recitation">
+            <svg style="width:48px;height:48px;color:var(--muted);margin-bottom:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+            <p style="font-size:14px;color:var(--ink);margin-bottom:4px;font-weight:600;">لم نعثر على إلقاء مطابق</p>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:20px;">قد يكون هناك إلقاء لهذه القصيدة لم تتم فهرسته بعد.</p>
+            <a href="${esc(watchUrl)}" target="_blank" rel="noopener" class="yt-search-btn">
+              ابحث في YouTube ↗
+            </a>
+          </div>`;
+        fallback.hidden = false;
       }
     } catch (_) {
       if (this.state.poem?.id === Number(poemId)) showYouTubeSearch();
