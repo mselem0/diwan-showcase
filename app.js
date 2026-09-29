@@ -377,7 +377,7 @@ class Mishkat {
         placeholder.hidden = true;
         fallback.hidden = true;
         frame.innerHTML = `<iframe
-          src="${esc(data.embed_url)}?rel=0&modestbranding=1&playsinline=1"
+          src="${esc(data.embed_url)}"
           title="${esc(data.title || 'إلقاء القصيدة')}"
           allow="autoplay; encrypted-media; picture-in-picture"
           allowfullscreen
